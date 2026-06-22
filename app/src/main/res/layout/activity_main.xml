@@ -73,23 +73,30 @@
                 android:paddingTop="28dp"
                 android:paddingBottom="24dp">
 
-                <EditText
-                    android:id="@+id/expressionText"
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:background="@null"
-                    android:cursorVisible="true"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:includeFontPadding="false"
-                    android:inputType="textNoSuggestions"
-                    android:longClickable="false"
-                    android:singleLine="true"
-                    android:text="0"
-                    android:textColor="@color/display_text"
-                    android:textSize="58sp"
-                    android:textStyle="bold" />
+                    android:gravity="end|center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/expressionText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:includeFontPadding="false"
+                        android:text="0"
+                        android:textColor="@color/display_text"
+                        android:textSize="58sp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:id="@+id/expressionCursor"
+                        android:layout_width="3dp"
+                        android:layout_height="72dp"
+                        android:layout_marginStart="6dp"
+                        android:background="@color/operator_button_background" />
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/previewText"
@@ -119,14 +126,14 @@
                         android:text="AC" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnToggleSign"
-                        style="@style/CalculatorUtilityButton"
-                        android:text="⌫" />
-
-                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnPercent"
                         style="@style/CalculatorUtilityButton"
                         android:text="%" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBackspace"
+                        style="@style/CalculatorUtilityButton"
+                        android:text="⌫" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnDivide"
@@ -222,7 +229,7 @@
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnBackspace"
+                        android:id="@+id/btnDoubleZero"
                         style="@style/CalculatorUtilityButton"
                         android:text="00" />
 
