@@ -1,0 +1,41 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.SimpleCalculator" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@color/screen_background</item>
+        <item name="android:navigationBarColor">@color/screen_background</item>
+        <item name="android:windowBackground">@color/screen_background</item>
+    </style>
+
+    <style name="Theme.SimpleCalculator" parent="Base.Theme.SimpleCalculator" />
+
+    <style name="Theme.SimpleCalculator.Splash" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/splash_background</item>
+        <item name="android:statusBarColor">@color/splash_background</item>
+        <item name="android:navigationBarColor">@color/splash_background</item>
+    </style>
+
+    <style name="CalculatorButtonBase" parent="Widget.Material3.Button">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">64dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginHorizontal">5dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="cornerRadius">999dp</item>
+    </style>
+
+    <style name="CalculatorNumberButton" parent="CalculatorButtonBase">
+        <item name="backgroundTint">@color/number_button_background</item>
+        <item name="android:textColor">@color/number_button_text</item>
+    </style>
+
+    <style name="CalculatorUtilityButton" parent="CalculatorButtonBase">
+        <item name="backgroundTint">@color/utility_button_background</item>
+        <item name="android:textColor">@color/utility_button_text</item>
+    </style>
+
+    <style name="CalculatorOperatorButton" parent="CalculatorButtonBase">
+        <item name="backgroundTint">@color/operator_button_background</item>
+        <item name="android:textColor">@color/operator_button_text</item>
+    </style>
+</resources>

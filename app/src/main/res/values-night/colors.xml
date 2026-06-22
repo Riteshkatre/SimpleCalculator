@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="screen_background">#1A1610</color>
+    <color name="card_background">#2A251D</color>
+    <color name="display_text">#F2EEE8</color>
+    <color name="secondary_text">#D5CEC2</color>
+    <color name="number_button_background">#676056</color>
+    <color name="number_button_text">#FFFFFF</color>
+    <color name="operator_button_background">#F59F00</color>
+    <color name="operator_button_text">#FFFFFF</color>
+    <color name="utility_button_background">#8A847B</color>
+    <color name="utility_button_text">#FFFFFF</color>
+    <color name="splash_background">#16120D</color>
+    <color name="splash_card_background">#2C261D</color>
+    <color name="splash_text">#F3EDE1</color>
+    <color name="splash_subtext">#B8B0A2</color>
+</resources>
