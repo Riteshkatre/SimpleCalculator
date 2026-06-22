@@ -16,15 +16,15 @@ It includes a splash screen, dark/light theme support, and a calculator UI inspi
 
 ### Splash Screen
 
-![Splash Screen](docs/screenshots/splash.png)
+<img src="docs/screenshots/splash.png" alt="Splash Screen" width="200" height="400" />
 
 ### Calculator - Light Theme
 
-![Calculator Light Theme](docs/screenshots/calculator-light.png)
+<img src="docs/screenshots/calculator-light.png" alt="Calculator Light Theme" width="200" height="400" />
 
 ### Calculator - Dark Theme
 
-![Calculator Dark Theme](docs/screenshots/calculator-dark.png)
+<img src="docs/screenshots/calculator-dark.png" alt="Calculator Dark Theme" width="200" height="400" />
 
 ## Tech Stack
 
