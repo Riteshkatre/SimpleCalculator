@@ -1,10 +1,10 @@
-package com.example.simplecalculator
+package com.riteshkatre.simplecalculator
 
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.example.simplecalculator.databinding.ActivityMainBinding
+import com.riteshkatre.simplecalculator.databinding.ActivityMainBinding
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat

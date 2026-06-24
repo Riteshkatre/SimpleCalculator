@@ -1,11 +1,11 @@
-package com.example.simplecalculator
+package com.riteshkatre.simplecalculator
 
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
-import com.example.simplecalculator.databinding.ActivitySplashBinding
+import com.riteshkatre.simplecalculator.databinding.ActivitySplashBinding
 
 class SplashActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySplashBinding

@@ -1,4 +1,4 @@
-package com.example.simplecalculator
+package com.riteshkatre.simplecalculator
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate

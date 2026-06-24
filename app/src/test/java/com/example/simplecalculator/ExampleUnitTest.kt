@@ -1,4 +1,4 @@
-package com.example.simplecalculator
+package com.riteshkatre.simplecalculator
 
 import org.junit.Test
 
