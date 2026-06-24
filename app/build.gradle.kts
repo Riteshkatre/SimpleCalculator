@@ -1,8 +1,28 @@
+import org.gradle.kotlin.dsl.libs
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
 }
 
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 android {
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("simpleCalculatorAndroid.jks")
+            storePassword = "Ritesh@2001"
+            keyAlias = "simpleCalculatorAndroid"
+            keyPassword = "Ritesh@2001"
+        }
+    }
+
     namespace = "com.riteshkatre.simplecalculator"
     compileSdk {
         version = release(36) {
