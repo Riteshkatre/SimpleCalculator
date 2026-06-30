@@ -1,255 +1,433 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/screen_background"
+    android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/calculatorCard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        app:cardBackgroundColor="@color/card_background"
-        app:cardCornerRadius="28dp"
-        app:cardElevation="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <LinearLayout
+            android:id="@+id/layoutMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="10dp">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/calculator_title"
+                android:textColor="@color/secondary_text"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnScientificMode"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                app:backgroundTint="@color/card_background"
+                app:cornerRadius="22dp"
+                app:icon="@drawable/calculator"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconTint="@null"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                app:strokeWidth="0dp" />
+            </RelativeLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMoreCalculators"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="10dp"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                app:backgroundTint="@color/card_background"
+                app:cornerRadius="22dp"
+                app:icon="@drawable/dots"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconTint="@null"
+                app:strokeWidth="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnOverflowMenu"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="10dp"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:padding="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                app:backgroundTint="@color/card_background"
+                app:cornerRadius="22dp"
+                app:icon="@drawable/menu"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconTint="@null"
+                app:strokeWidth="0dp" />
+
+        </LinearLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/materialCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layoutMain"
+            android:layout_marginTop="18dp"
+            app:cardBackgroundColor="@color/card_background"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/secondary_text"
+            app:strokeWidth="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:padding="20dp">
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:id="@+id/expressionText"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/calculator_title"
-                    android:textColor="@color/secondary_text"
-                    android:textSize="14sp"
+                    android:gravity="end"
+                    android:includeFontPadding="false"
+                    android:text="0"
+                    android:textColor="@color/display_text"
+                    android:textSize="26sp"
                     android:textStyle="bold" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/themeToggle"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:contentDescription="@string/switch_to_dark_theme"
-                    android:insetLeft="0dp"
-                    android:insetTop="0dp"
-                    android:insetRight="0dp"
-                    android:insetBottom="0dp"
-                    app:icon="@drawable/theme_toggle_icon"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconSize="26dp"
-                    app:iconTint="@null"
-                    app:backgroundTint="@color/display_text"
-                    app:cornerRadius="22dp"
-                    app:strokeWidth="0dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="end|bottom"
-                android:orientation="vertical"
-                android:paddingTop="28dp"
-                android:paddingBottom="24dp">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="end|center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/expressionText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="end"
-                        android:includeFontPadding="false"
-                        android:text="0"
-                        android:textColor="@color/display_text"
-                        android:textSize="58sp"
-                        android:textStyle="bold" />
-
-                    <View
-                        android:id="@+id/expressionCursor"
-                        android:layout_width="3dp"
-                        android:layout_height="72dp"
-                        android:layout_marginStart="6dp"
-                        android:background="@color/operator_button_background" />
-                </LinearLayout>
 
                 <TextView
                     android:id="@+id/previewText"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="10dp"
                     android:gravity="end"
                     android:includeFontPadding="false"
                     android:textColor="@color/secondary_text"
-                    android:textSize="30sp"
+                    android:textSize="32sp"
                     android:textStyle="bold" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCopyResult"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:text="Copy"
+                        android:textAllCaps="false"
+                        android:textColor="@color/display_text"
+                        android:textSize="12sp"
+                        app:backgroundTint="@color/screen_background"
+                        app:cornerRadius="20dp"
+                        app:strokeWidth="0dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnShareResult"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:text="Share"
+                        android:textAllCaps="false"
+                        android:textColor="@color/display_text"
+                        android:textSize="12sp"
+                        app:backgroundTint="@color/screen_background"
+                        app:cornerRadius="20dp"
+                        app:strokeWidth="0dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSaveResult"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:text="Save"
+                        android:textAllCaps="false"
+                        android:textColor="@color/display_text"
+                        android:textSize="12sp"
+                        app:backgroundTint="@color/screen_background"
+                        app:cornerRadius="20dp"
+                        app:strokeWidth="0dp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:id="@+id/scientificPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/numberCard"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnSin"
+                    style="@style/CalculatorNumberButton"
+                    android:text="sin" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnCos"
+                    style="@style/CalculatorNumberButton"
+                    android:text="cos" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnTan"
+                    style="@style/CalculatorNumberButton"
+                    android:text="tan" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnAngleMode"
+                    style="@style/CalculatorOperatorButton"
+                    android:text="deg" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnPi"
+                    style="@style/CalculatorNumberButton"
+                    android:text="π" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnLog"
+                    style="@style/CalculatorNumberButton"
+                    android:text="log" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnClear"
-                        style="@style/CalculatorUtilityButton"
-                        android:text="AC" />
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnLn"
+                    style="@style/CalculatorNumberButton"
+                    android:text="ln" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnPercent"
-                        style="@style/CalculatorUtilityButton"
-                        android:text="%" />
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnSquare"
+                    style="@style/CalculatorNumberButton"
+                    android:text="x²" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnBackspace"
-                        style="@style/CalculatorUtilityButton"
-                        android:text="⌫" />
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnCube"
+                    style="@style/CalculatorNumberButton"
+                    android:text="x³" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnDivide"
-                        style="@style/CalculatorOperatorButton"
-                        android:text="÷" />
-                </LinearLayout>
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnSqrt"
+                    style="@style/CalculatorNumberButton"
+                    android:text="√" />
+            </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn7"
-                        style="@style/CalculatorNumberButton"
-                        android:text="7" />
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnReciprocal"
+                    style="@style/CalculatorUtilityButton"
+                    android:text="1/x" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn8"
-                        style="@style/CalculatorNumberButton"
-                        android:text="8" />
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnFactorial"
+                    style="@style/CalculatorUtilityButton"
+                    android:text="!" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn9"
-                        style="@style/CalculatorNumberButton"
-                        android:text="9" />
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnInverse"
+                    style="@style/CalculatorUtilityButton"
+                    android:text="inv" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnMultiply"
-                        style="@style/CalculatorOperatorButton"
-                        android:text="×" />
-                </LinearLayout>
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnClearScientific"
+                    style="@style/CalculatorUtilityButton"
+                    android:text="AC"
+                    android:visibility="gone" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn4"
-                        style="@style/CalculatorNumberButton"
-                        android:text="4" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn5"
-                        style="@style/CalculatorNumberButton"
-                        android:text="5" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn6"
-                        style="@style/CalculatorNumberButton"
-                        android:text="6" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnMinus"
-                        style="@style/CalculatorOperatorButton"
-                        android:text="−" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn1"
-                        style="@style/CalculatorNumberButton"
-                        android:text="1" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn2"
-                        style="@style/CalculatorNumberButton"
-                        android:text="2" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn3"
-                        style="@style/CalculatorNumberButton"
-                        android:text="3" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnPlus"
-                        style="@style/CalculatorOperatorButton"
-                        android:text="+" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnDoubleZero"
-                        style="@style/CalculatorUtilityButton"
-                        android:text="00" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn0"
-                        style="@style/CalculatorNumberButton"
-                        android:text="0" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnDecimal"
-                        style="@style/CalculatorNumberButton"
-                        android:text="." />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnEquals"
-                        style="@style/CalculatorOperatorButton"
-                        android:text="=" />
-                </LinearLayout>
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnDummyScientific"
+                    style="@style/CalculatorUtilityButton"
+                    android:text=""
+                    android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:id="@+id/numberCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnClear"
+                    style="@style/CalculatorUtilityButton"
+                    android:text="AC" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnPercent"
+                    style="@style/CalculatorUtilityButton"
+                    android:text="%" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnBackspace"
+                    style="@style/CalculatorUtilityButton"
+                    android:text="⌫" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnDivide"
+                    style="@style/CalculatorOperatorButton"
+                    android:text="÷" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn7"
+                    style="@style/CalculatorNumberButton"
+                    android:text="7" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn8"
+                    style="@style/CalculatorNumberButton"
+                    android:text="8" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn9"
+                    style="@style/CalculatorNumberButton"
+                    android:text="9" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnMultiply"
+                    style="@style/CalculatorOperatorButton"
+                    android:text="×" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn4"
+                    style="@style/CalculatorNumberButton"
+                    android:text="4" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn5"
+                    style="@style/CalculatorNumberButton"
+                    android:text="5" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn6"
+                    style="@style/CalculatorNumberButton"
+                    android:text="6" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnMinus"
+                    style="@style/CalculatorOperatorButton"
+                    android:text="−" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn1"
+                    style="@style/CalculatorNumberButton"
+                    android:text="1" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn2"
+                    style="@style/CalculatorNumberButton"
+                    android:text="2" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn3"
+                    style="@style/CalculatorNumberButton"
+                    android:text="3" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnPlus"
+                    style="@style/CalculatorOperatorButton"
+                    android:text="+" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnDoubleZero"
+                    style="@style/CalculatorUtilityButton"
+                    android:text="00" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn0"
+                    style="@style/CalculatorNumberButton"
+                    android:text="0" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnDecimal"
+                    style="@style/CalculatorNumberButton"
+                    android:text="." />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnEquals"
+                    style="@style/CalculatorOperatorButton"
+                    android:text="=" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>

@@ -8,6 +8,7 @@ object AppTheme {
     private const val PREFS_NAME = "calculator_prefs"
     private const val KEY_THEME_MODE = "theme_mode"
 
+    const val MODE_SYSTEM = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
     const val MODE_LIGHT = AppCompatDelegate.MODE_NIGHT_NO
     const val MODE_DARK = AppCompatDelegate.MODE_NIGHT_YES
 

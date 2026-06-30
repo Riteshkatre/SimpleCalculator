@@ -3,6 +3,10 @@
     <string name="calculator_title">CALCULATOR</string>
     <string name="switch_to_light_theme">Switch to light theme</string>
     <string name="switch_to_dark_theme">Switch to dark theme</string>
+    <string name="show_scientific_mode">Show scientific mode</string>
+    <string name="hide_scientific_mode">Hide scientific mode</string>
+    <string name="open_calculators">Open calculators</string>
+    <string name="open_menu">Open menu</string>
     <string name="splash_tagline">Fast, clean, and simple</string>
     <string name="splash_footer">Made By Ritesh ❤️</string>
 </resources>

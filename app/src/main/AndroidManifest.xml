@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SimpleCalculator">
         <activity
-            android:name=".SplashActivity"
+            android:name="com.riteshkatre.simplecalculator.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.SimpleCalculator.Splash">
             <intent-filter>
@@ -22,7 +22,31 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name="com.riteshkatre.simplecalculator.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.riteshkatre.simplecalculator.CalculatorsActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.riteshkatre.simplecalculator.GstCalculatorActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.riteshkatre.simplecalculator.PercentageCalculatorActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.riteshkatre.simplecalculator.EmiCalculatorActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.riteshkatre.simplecalculator.UnitConverterActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.riteshkatre.simplecalculator.AgeCalculatorActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.riteshkatre.simplecalculator.HistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.riteshkatre.simplecalculator.SettingsActivity"
             android:exported="false" />
     </application>
 

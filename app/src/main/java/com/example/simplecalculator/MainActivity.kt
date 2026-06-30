@@ -1,16 +1,12 @@
 package com.riteshkatre.simplecalculator
 
-import android.content.res.Configuration
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import com.riteshkatre.simplecalculator.databinding.ActivityMainBinding
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
-import java.util.Locale
-import kotlin.math.abs
+import kotlin.math.PI
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,6 +16,11 @@ class MainActivity : AppCompatActivity() {
     private var leftOperand: Double? = null
     private var pendingOperator: String? = null
     private var justEvaluated = false
+    private var scientificMode = false
+    private var angleModeDegrees = true
+    private var inverseMode = false
+    private var lastShareExpression = ""
+    private var lastShareResult = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppTheme.applySavedMode(this)
@@ -27,26 +28,39 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        bindThemeToggle()
+        bindTopBar()
         bindButtons()
+        updateScientificPanel()
         renderDisplay()
     }
 
-    private fun bindThemeToggle() {
-        updateThemeIcon()
-        binding.themeToggle.setOnClickListener {
-            val current = AppTheme.getThemeMode(this)
-            val next = if (current == AppTheme.MODE_DARK) AppTheme.MODE_LIGHT else AppTheme.MODE_DARK
-            AppTheme.setThemeMode(this, next)
+    private fun bindTopBar() {
+        binding.btnScientificMode.setOnClickListener {
+            scientificMode = !scientificMode
+            updateScientificPanel()
         }
-    }
 
-    private fun updateThemeIcon() {
-        val isDark = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-        binding.themeToggle.contentDescription = if (isDark) {
-            getString(R.string.switch_to_light_theme)
-        } else {
-            getString(R.string.switch_to_dark_theme)
+        binding.btnMoreCalculators.setOnClickListener {
+            startActivity(Intent(this, CalculatorsActivity::class.java))
+        }
+
+        binding.btnOverflowMenu.setOnClickListener { anchor ->
+            val popup = PopupMenu(this, anchor)
+            popup.menuInflater.inflate(R.menu.main_overflow_menu, popup.menu)
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.menu_history -> {
+                        startActivity(Intent(this, HistoryActivity::class.java))
+                        true
+                    }
+                    R.id.menu_settings -> {
+                        startActivity(Intent(this, SettingsActivity::class.java))
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.show()
         }
     }
 
@@ -67,11 +81,53 @@ class MainActivity : AppCompatActivity() {
         binding.btnBackspace.setOnClickListener { backspacePressed() }
         binding.btnPercent.setOnClickListener { percentPressed() }
 
-        binding.btnDivide.setOnClickListener { onOperatorPressed("/") }
+        binding.btnDivide.setOnClickListener { onOperatorPressed("÷") }
         binding.btnMultiply.setOnClickListener { onOperatorPressed("×") }
         binding.btnMinus.setOnClickListener { onOperatorPressed("−") }
         binding.btnPlus.setOnClickListener { onOperatorPressed("+") }
         binding.btnEquals.setOnClickListener { onEqualsPressed() }
+
+        binding.btnCopyResult.setOnClickListener { copyCurrentResult() }
+        binding.btnShareResult.setOnClickListener { shareCurrentResult() }
+        binding.btnSaveResult.setOnClickListener { saveCurrentResult() }
+
+        binding.btnSin.setOnClickListener { applyScientific("sin") }
+        binding.btnCos.setOnClickListener { applyScientific("cos") }
+        binding.btnTan.setOnClickListener { applyScientific("tan") }
+        binding.btnLog.setOnClickListener { applyScientific("log") }
+        binding.btnLn.setOnClickListener { applyScientific("ln") }
+        binding.btnSquare.setOnClickListener { applyScientific("x²") }
+        binding.btnCube.setOnClickListener { applyScientific("x³") }
+        binding.btnSqrt.setOnClickListener { applyScientific("√") }
+        binding.btnReciprocal.setOnClickListener { applyScientific("1/x") }
+        binding.btnFactorial.setOnClickListener { applyScientific("!") }
+        binding.btnPi.setOnClickListener { insertConstantPI() }
+        binding.btnAngleMode.setOnClickListener {
+            angleModeDegrees = !angleModeDegrees
+            updateScientificPanel()
+        }
+        binding.btnInverse.setOnClickListener {
+            inverseMode = !inverseMode
+            updateScientificPanel()
+        }
+    }
+
+    private fun updateScientificPanel() {
+        binding.scientificPanel.visibility = if (scientificMode) View.VISIBLE else View.GONE
+        binding.btnScientificMode.text = if (scientificMode) "123" else "√π"
+        binding.btnAngleMode.text = if (angleModeDegrees) "deg" else "rad"
+        binding.btnInverse.text = if (inverseMode) "inv*" else "inv"
+        updateTopBarDescriptions()
+    }
+
+    private fun updateTopBarDescriptions() {
+        binding.btnOverflowMenu.contentDescription = getString(R.string.open_menu)
+        binding.btnMoreCalculators.contentDescription = getString(R.string.open_calculators)
+        binding.btnScientificMode.contentDescription = if (scientificMode) {
+            getString(R.string.hide_scientific_mode)
+        } else {
+            getString(R.string.show_scientific_mode)
+        }
     }
 
     private fun onDigitPressed(digit: String) {
@@ -86,6 +142,8 @@ class MainActivity : AppCompatActivity() {
             else -> currentInput + digit
         }
 
+        lastShareExpression = ""
+        lastShareResult = ""
         justEvaluated = false
         renderDisplay()
     }
@@ -102,13 +160,19 @@ class MainActivity : AppCompatActivity() {
             else -> "$currentInput."
         }
 
+        lastShareExpression = ""
+        lastShareResult = ""
         justEvaluated = false
         renderDisplay()
     }
 
     private fun percentPressed() {
-        val value = currentInputValue() / 100.0
-        currentInput = formatNumber(value)
+        val input = currentInputValue()
+        val value = input / 100.0
+        currentInput = CalculatorMath.formatNumber(value)
+        lastShareExpression = "${CalculatorMath.formatNumber(input)}%"
+        lastShareResult = currentInput
+        HistoryStore.add(this, lastShareExpression, lastShareResult)
         justEvaluated = false
         renderDisplay()
     }
@@ -130,6 +194,8 @@ class MainActivity : AppCompatActivity() {
             currentInput = "0"
         }
 
+        lastShareExpression = ""
+        lastShareResult = ""
         renderDisplay()
     }
 
@@ -139,11 +205,13 @@ class MainActivity : AppCompatActivity() {
         if (leftOperand == null) {
             leftOperand = current
         } else if (pendingOperator != null && !justEvaluated) {
-            leftOperand = calculate(leftOperand!!, current, pendingOperator!!)
+            leftOperand = CalculatorMath.calculateBinary(leftOperand!!, current, pendingOperator!!)
         }
 
         pendingOperator = operator
         currentInput = "0"
+        lastShareExpression = ""
+        lastShareResult = ""
         justEvaluated = false
         renderDisplay()
     }
@@ -152,11 +220,45 @@ class MainActivity : AppCompatActivity() {
         val operator = pendingOperator ?: return
         val left = leftOperand ?: currentInputValue()
         val right = currentInputValue()
+        val result = CalculatorMath.calculateBinary(left, right, operator)
 
-        currentInput = formatNumber(calculate(left, right, operator))
+        currentInput = CalculatorMath.formatNumber(result)
+        lastShareExpression = "${CalculatorMath.formatNumber(left)} $operator ${CalculatorMath.formatNumber(right)}"
+        lastShareResult = currentInput
+        HistoryStore.add(this, lastShareExpression, lastShareResult)
+
         leftOperand = null
         pendingOperator = null
         justEvaluated = true
+        renderDisplay()
+    }
+
+    private fun applyScientific(function: String) {
+        val value = currentInputValue()
+        val result = CalculatorMath.applyUnary(value, function, angleModeDegrees, inverseMode)
+        currentInput = CalculatorMath.formatNumber(result)
+        lastShareExpression = when (function) {
+            "x²" -> "${CalculatorMath.formatNumber(value)}²"
+            "x³" -> "${CalculatorMath.formatNumber(value)}³"
+            "1/x" -> "1 / ${CalculatorMath.formatNumber(value)}"
+            "!" -> "${CalculatorMath.formatNumber(value)}!"
+            "√" -> "√${CalculatorMath.formatNumber(value)}"
+            else -> "$function(${CalculatorMath.formatNumber(value)})"
+        }
+        lastShareResult = currentInput
+        HistoryStore.add(this, lastShareExpression, lastShareResult)
+
+        leftOperand = null
+        pendingOperator = null
+        justEvaluated = true
+        renderDisplay()
+    }
+
+    private fun insertConstantPI() {
+        currentInput = CalculatorMath.formatNumber(PI)
+        lastShareExpression = ""
+        lastShareResult = ""
+        justEvaluated = false
         renderDisplay()
     }
 
@@ -165,21 +267,13 @@ class MainActivity : AppCompatActivity() {
         leftOperand = null
         pendingOperator = null
         justEvaluated = false
+        lastShareExpression = ""
+        lastShareResult = ""
         renderDisplay()
     }
 
     private fun currentInputValue(): Double {
-        return normalizeNumericString(currentInput).toDoubleOrNull() ?: 0.0
-    }
-
-    private fun calculate(left: Double, right: Double, operator: String): Double {
-        return when (operator) {
-            "+" -> left + right
-            "−" -> left - right
-            "×" -> left * right
-            "/" -> if (right == 0.0) Double.NaN else left / right
-            else -> right
-        }
+        return CalculatorMath.parseDouble(normalizeNumericString(currentInput))
     }
 
     private fun normalizeNumericString(value: String): String {
@@ -191,35 +285,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun formatNumber(value: Double): String {
-        if (value.isNaN() || value.isInfinite()) {
-            return "Error"
-        }
-
-        val normalized = if (abs(value) < 0.0000001) 0.0 else value
-        val rounded = BigDecimal.valueOf(normalized)
-            .setScale(10, RoundingMode.HALF_UP)
-            .stripTrailingZeros()
-            .toPlainString()
-
-        val parts = rounded.split(".")
-        val integerPart = parts[0].replace("-", "")
-        val formattedInteger = DecimalFormat("#,###", DecimalFormatSymbols(Locale.getDefault())).format(integerPart.toLong())
-        return if (rounded.startsWith("-")) {
-            "-$formattedInteger" + parts.getOrNull(1)?.let { ".$it" }.orEmpty()
-        } else {
-            formattedInteger + parts.getOrNull(1)?.let { ".$it" }.orEmpty()
-        }
-    }
-
     private fun buildExpressionText(): String {
         return when {
             leftOperand != null && pendingOperator != null -> {
-                val left = formatNumber(leftOperand!!)
+                val left = CalculatorMath.formatNumber(leftOperand!!)
                 if (currentInput == "0" && !justEvaluated) {
-                    "$left$pendingOperator"
+                    "$left $pendingOperator"
                 } else {
-                    "$left$pendingOperator$currentInput"
+                    "$left $pendingOperator ${currentInput}"
                 }
             }
             else -> currentInput
@@ -229,9 +302,39 @@ class MainActivity : AppCompatActivity() {
     private fun buildPreviewText(): String {
         return when {
             leftOperand != null && pendingOperator != null && currentInput != "0" ->
-                formatNumber(calculate(leftOperand!!, currentInputValue(), pendingOperator!!))
+                CalculatorMath.formatNumber(
+                    CalculatorMath.calculateBinary(leftOperand!!, currentInputValue(), pendingOperator!!)
+                )
             else -> ""
         }
+    }
+
+    private fun currentShareText(): String {
+        val expression = if (lastShareExpression.isNotBlank()) lastShareExpression else buildExpressionText()
+        val result = if (lastShareResult.isNotBlank()) lastShareResult else buildPreviewText().ifBlank { currentInput }
+        return "Calculation:\n$expression = $result\nCalculated using ${getString(R.string.app_name)}"
+    }
+
+    private fun currentResultText(): String {
+        return if (lastShareResult.isNotBlank()) {
+            lastShareResult
+        } else {
+            buildPreviewText().ifBlank { currentInput }
+        }
+    }
+
+    private fun copyCurrentResult() {
+        copyToClipboard(getString(R.string.app_name), currentResultText())
+    }
+
+    private fun shareCurrentResult() {
+        sharePlainText(getString(R.string.app_name), currentShareText())
+    }
+
+    private fun saveCurrentResult() {
+        val expression = if (lastShareExpression.isNotBlank()) lastShareExpression else buildExpressionText()
+        val result = if (lastShareResult.isNotBlank()) lastShareResult else buildPreviewText().ifBlank { currentInput }
+        HistoryStore.add(this, expression, result)
     }
 
     private fun renderDisplay() {
@@ -240,6 +343,5 @@ class MainActivity : AppCompatActivity() {
         binding.previewText.alpha = if (binding.previewText.text.isNullOrEmpty()) 0f else 1f
 
         val showCursor = pendingOperator != null || currentInput != "0" || justEvaluated
-        binding.expressionCursor.visibility = if (showCursor) View.VISIBLE else View.INVISIBLE
     }
 }
