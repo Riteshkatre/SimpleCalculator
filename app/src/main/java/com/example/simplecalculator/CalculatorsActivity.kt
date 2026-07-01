@@ -22,6 +22,7 @@ class CalculatorsActivity : AppCompatActivity() {
         binding.cardUnit.setOnClickListener { open(UnitConverterActivity::class.java) }
         binding.cardAge.setOnClickListener { open(AgeCalculatorActivity::class.java) }
         binding.cardNumberSystem.setOnClickListener { open(NumberSystemConverterActivity::class.java) }
+        binding.cardCurrency.setOnClickListener { open(CurrencyConverterActivity::class.java) }
     }
 
     private fun open(target: Class<*>) {
