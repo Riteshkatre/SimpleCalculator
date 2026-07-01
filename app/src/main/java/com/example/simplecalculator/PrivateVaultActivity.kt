@@ -1,11 +1,13 @@
 package com.riteshkatre.simplecalculator
 
 import android.app.AlertDialog
+import android.content.ClipData
 import android.content.ContentValues
 import android.database.Cursor
 import android.content.Intent
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.media.MediaScannerConnection
@@ -19,6 +21,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.IntentSenderRequest
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.riteshkatre.simplecalculator.databinding.ActivityPrivateVaultBinding
@@ -39,19 +42,38 @@ import javax.crypto.CipherInputStream
 class PrivateVaultActivity : AppCompatActivity() {
 
     private enum class EntryAction { MOVE, COPY }
+    private data class SharedImportResult(
+        val importedCount: Int,
+        val removedCount: Int,
+        val failedCount: Int,
+    )
 
     private lateinit var binding: ActivityPrivateVaultBinding
     private var isUnlocked = false
     private var currentFolder = PrivateVaultStore.defaultFolder()
     private var folders = mutableListOf<String>()
     private var entries = mutableListOf<VaultFileEntry>()
+    private var pendingSharedUris = mutableListOf<Uri>()
+    private var pendingDeleteToast: String? = null
 
     private val openDocumentLauncher = registerForActivityResult(
-        ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        if (uri != null) {
-            importFile(uri)
+        ActivityResultContracts.OpenMultipleDocuments()
+    ) { uris ->
+        if (!uris.isNullOrEmpty()) {
+            importFiles(uris)
         }
+    }
+
+    private val deleteSharedLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        val message = if (result.resultCode == RESULT_OK) {
+            pendingDeleteToast ?: "Original shared files removed from system storage"
+        } else {
+            "Imported to vault, but system deletion was cancelled"
+        }
+        pendingDeleteToast = null
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,11 +84,18 @@ class PrivateVaultActivity : AppCompatActivity() {
 
         binding.btnBack.setOnClickListener { finish() }
         binding.btnPasswordAction.setOnClickListener { handlePasswordAction() }
-        binding.btnImportFile.setOnClickListener { openDocumentLauncher.launch(arrayOf("*/*")) }
+        binding.btnImportFile.setOnClickListener { openDocumentLauncher.launch(arrayOf("image/*")) }
         binding.btnNewFolder.setOnClickListener { promptNewFolder() }
         binding.btnLockVault.setOnClickListener { lockVault() }
 
         setupInitialState()
+        handleIncomingIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIncomingIntent(intent)
     }
 
     override fun onResume() {
@@ -97,13 +126,13 @@ class PrivateVaultActivity : AppCompatActivity() {
             PrivateVaultStore.savePassword(this, password)
             Toast.makeText(this, "Vault passcode created", Toast.LENGTH_SHORT).show()
             isUnlocked = true
-            loadVault()
+            processPendingSharesIfNeeded()
             return
         }
 
         if (PrivateVaultStore.verifyPassword(this, password)) {
             isUnlocked = true
-            loadVault()
+            processPendingSharesIfNeeded()
         } else {
             binding.statusText.text = "Wrong passcode. Try again."
         }
@@ -121,6 +150,7 @@ class PrivateVaultActivity : AppCompatActivity() {
         binding.btnPasswordAction.text = "Create Vault"
         binding.vaultSection.visibility = View.GONE
         binding.passwordCard.visibility = View.VISIBLE
+        applyPendingShareHint()
     }
 
     private fun showUnlockUi() {
@@ -129,6 +159,7 @@ class PrivateVaultActivity : AppCompatActivity() {
         binding.btnPasswordAction.text = "Unlock Vault"
         binding.vaultSection.visibility = View.GONE
         binding.passwordCard.visibility = View.VISIBLE
+        applyPendingShareHint()
     }
 
     private fun updateLockedUi() {
@@ -136,6 +167,15 @@ class PrivateVaultActivity : AppCompatActivity() {
             showUnlockUi()
         } else {
             showSetupUi()
+        }
+    }
+
+    private fun applyPendingShareHint() {
+        if (pendingSharedUris.isEmpty()) return
+        binding.statusText.text = if (PrivateVaultStore.hasPassword(this)) {
+            "Shared files are ready. Unlock the vault to import them."
+        } else {
+            "Shared files detected. Create or enter your passcode to import them."
         }
     }
 
@@ -147,6 +187,129 @@ class PrivateVaultActivity : AppCompatActivity() {
         binding.vaultWelcomeText.text = "Files are stored privately inside the app."
         updateFolderSpinner()
         renderEntries()
+    }
+
+    private fun handleIncomingIntent(intent: Intent?) {
+        val incomingUris = extractSharedUris(intent)
+        if (incomingUris.isEmpty()) return
+        pendingSharedUris.clear()
+        pendingSharedUris.addAll(incomingUris)
+        if (isUnlocked) {
+            processPendingSharesIfNeeded()
+        } else {
+            applyPendingShareHint()
+        }
+    }
+
+    private fun extractSharedUris(intent: Intent?): List<Uri> {
+        if (intent == null) return emptyList()
+        val uris = mutableListOf<Uri>()
+
+        when (intent.action) {
+            Intent.ACTION_SEND -> {
+                @Suppress("DEPRECATION")
+                intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)?.let { uris += it }
+            }
+            Intent.ACTION_SEND_MULTIPLE -> {
+                @Suppress("DEPRECATION")
+                intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)?.let { uris += it }
+            }
+        }
+
+        intent.clipData?.let { clipData: ClipData ->
+            for (index in 0 until clipData.itemCount) {
+                clipData.getItemAt(index)?.uri?.let { uris += it }
+            }
+        }
+
+        return uris.distinct()
+    }
+
+    private fun processPendingSharesIfNeeded() {
+        if (pendingSharedUris.isEmpty()) {
+            loadVault()
+            return
+        }
+
+        val sharedUris = pendingSharedUris.toList()
+        pendingSharedUris.clear()
+
+        val result = importSharedUris(sharedUris)
+        loadVault()
+
+        val message = buildString {
+            if (result.importedCount > 0) {
+                append("Imported ${result.importedCount} file")
+                if (result.importedCount > 1) append("s")
+                append(" to vault")
+            } else {
+                append("No shared files were imported")
+            }
+            if (result.failedCount > 0) {
+                append(". ${result.failedCount} file")
+                if (result.failedCount > 1) append("s")
+                append(" could not be removed from system storage")
+            }
+        }
+
+        if (sharedUris.isNotEmpty()) {
+            requestDeleteOriginals(sharedUris, message)
+        } else {
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun importSharedUris(uris: List<Uri>): SharedImportResult {
+        var importedCount = 0
+        var removedCount = 0
+        var failedCount = 0
+
+        uris.forEach { uri ->
+            val imported = importSharedUri(uri, removeFromSource = false, showToast = false)
+            if (imported) {
+                importedCount++
+            } else {
+                failedCount++
+            }
+        }
+
+        return SharedImportResult(importedCount, removedCount, failedCount)
+    }
+
+    private fun requestDeleteOriginals(uris: List<Uri>, pendingMessage: String) {
+        if (uris.isEmpty()) {
+            Toast.makeText(this, pendingMessage, Toast.LENGTH_LONG).show()
+            return
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            pendingDeleteToast = pendingMessage
+            runCatching {
+                val request = MediaStore.createDeleteRequest(contentResolver, uris)
+                deleteSharedLauncher.launch(
+                    IntentSenderRequest.Builder(request.intentSender).build()
+                )
+            }.onFailure {
+                pendingDeleteToast = null
+                val removed = uris.count { tryRemoveSource(it) }
+                val extra = if (removed > 0) {
+                    val plural = if (removed > 1) "s" else ""
+                    ". Removed $removed original file$plural from system storage"
+                } else {
+                    ". Original files could not be removed from system storage"
+                }
+                Toast.makeText(this, pendingMessage + extra, Toast.LENGTH_LONG).show()
+            }
+        } else {
+            val removed = uris.count { tryRemoveSource(it) }
+            val extra = if (removed > 0) {
+                val plural = if (removed > 1) "s" else ""
+                ". Removed $removed original file$plural from system storage"
+            } else {
+                ". Original files could not be removed from system storage"
+            }
+            Toast.makeText(this, pendingMessage + extra, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun updateFolderSpinner() {
@@ -371,8 +534,52 @@ class PrivateVaultActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun importFile(uri: Uri) {
-        if (!isUnlocked) return
+    private fun importFiles(uris: List<Uri>) {
+        if (uris.size == 1) {
+            importSharedUri(uris.first(), removeFromSource = true, showToast = true)
+            return
+        }
+
+        var importedCount = 0
+        var removedCount = 0
+        var failedCount = 0
+
+        uris.forEach { uri ->
+            val imported = importSharedUri(uri, removeFromSource = false, showToast = false)
+            if (imported) {
+                importedCount++
+                if (tryRemoveSource(uri)) {
+                    removedCount++
+                } else {
+                    failedCount++
+                }
+            } else {
+                failedCount++
+            }
+        }
+
+        loadVault()
+
+        val message = buildString {
+            append("Imported $importedCount file")
+            if (importedCount != 1) append("s")
+            append(" to vault")
+            if (removedCount > 0) {
+                append(". Removed $removedCount original file")
+                if (removedCount != 1) append("s")
+                append(" from system storage")
+            }
+            if (failedCount > 0) {
+                append(". $failedCount file")
+                if (failedCount != 1) append("s")
+                append(" could not be removed from system storage")
+            }
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    private fun importSharedUri(uri: Uri, removeFromSource: Boolean, showToast: Boolean): Boolean {
+        if (!isUnlocked) return false
         val name = queryDisplayName(uri) ?: "Imported File"
         val newId = UUID.randomUUID().toString()
         val encryptedName = "$newId.bin"
@@ -388,11 +595,11 @@ class PrivateVaultActivity : AppCompatActivity() {
             }
         } ?: run {
             Toast.makeText(this, "Unable to read file", Toast.LENGTH_SHORT).show()
-            return
+            return false
         }
 
-        runCatching {
-            DocumentsContract.deleteDocument(contentResolver, uri)
+        if (removeFromSource) {
+            tryRemoveSource(uri)
         }
 
         entries.add(
@@ -407,7 +614,20 @@ class PrivateVaultActivity : AppCompatActivity() {
         )
         persistEntries()
         renderEntries()
-        Toast.makeText(this, "File added to vault", Toast.LENGTH_SHORT).show()
+        if (showToast) {
+            Toast.makeText(this, "File added to vault", Toast.LENGTH_SHORT).show()
+        }
+        return true
+    }
+
+    private fun tryRemoveSource(uri: Uri): Boolean {
+        return runCatching {
+            if (DocumentsContract.isDocumentUri(this, uri)) {
+                DocumentsContract.deleteDocument(contentResolver, uri)
+            } else {
+                contentResolver.delete(uri, null, null) > 0
+            }
+        }.getOrDefault(false)
     }
 
     private fun openEntry(entry: VaultFileEntry) {
