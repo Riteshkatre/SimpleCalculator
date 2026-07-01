@@ -179,6 +179,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun backspacePressed() {
         if (currentInput == "Error" || currentInput == "0") {
+            if (pendingOperator != null && leftOperand != null) {
+                currentInput = CalculatorMath.formatNumber(leftOperand!!)
+                leftOperand = null
+                pendingOperator = null
+                justEvaluated = false
+                lastShareExpression = ""
+                lastShareResult = ""
+                renderDisplay()
+                return
+            }
+
             currentInput = "0"
             renderDisplay()
             return
@@ -188,6 +199,12 @@ class MainActivity : AppCompatActivity() {
             currentInput.length <= 1 -> "0"
             currentInput.length == 2 && currentInput.startsWith("-") -> "0"
             else -> currentInput.dropLast(1)
+        }
+
+        if (currentInput == "0" && pendingOperator != null && leftOperand != null) {
+            currentInput = CalculatorMath.formatNumber(leftOperand!!)
+            leftOperand = null
+            pendingOperator = null
         }
 
         if (currentInput == "-" || currentInput.isBlank()) {

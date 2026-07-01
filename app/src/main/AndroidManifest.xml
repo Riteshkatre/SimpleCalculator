@@ -40,6 +40,9 @@
             android:name="com.riteshkatre.simplecalculator.UnitConverterActivity"
             android:exported="false" />
         <activity
+            android:name="com.riteshkatre.simplecalculator.NumberSystemConverterActivity"
+            android:exported="false" />
+        <activity
             android:name="com.riteshkatre.simplecalculator.AgeCalculatorActivity"
             android:exported="false" />
         <activity

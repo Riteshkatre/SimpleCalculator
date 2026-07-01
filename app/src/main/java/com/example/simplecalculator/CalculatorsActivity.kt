@@ -21,6 +21,7 @@ class CalculatorsActivity : AppCompatActivity() {
         binding.cardEmi.setOnClickListener { open(EmiCalculatorActivity::class.java) }
         binding.cardUnit.setOnClickListener { open(UnitConverterActivity::class.java) }
         binding.cardAge.setOnClickListener { open(AgeCalculatorActivity::class.java) }
+        binding.cardNumberSystem.setOnClickListener { open(NumberSystemConverterActivity::class.java) }
     }
 
     private fun open(target: Class<*>) {
