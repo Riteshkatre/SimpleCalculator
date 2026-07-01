@@ -1,39 +1,55 @@
 package com.riteshkatre.simplecalculator
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.riteshkatre.simplecalculator.databinding.ActivityCurrencyConverterBinding
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.net.HttpURLConnection
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.Executors
+import org.json.JSONObject
 
 class CurrencyConverterActivity : AppCompatActivity() {
 
     private data class CurrencyOption(
         val label: String,
         val code: String,
-        val rateToUsd: BigDecimal,
     ) {
         override fun toString(): String = "$label $code"
     }
 
+    private data class FxRate(
+        val fromCode: String,
+        val toCode: String,
+        val rate: BigDecimal,
+        val fetchedAtLabel: String,
+    )
+
     private lateinit var binding: ActivityCurrencyConverterBinding
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val networkExecutor = Executors.newSingleThreadExecutor()
     private val currencies = listOf(
-        CurrencyOption("US Dollar", "USD", BigDecimal("1.0")),
-        CurrencyOption("Indian Rupee", "INR", BigDecimal("94.717016")),
-        CurrencyOption("Euro", "EUR", BigDecimal("0.92")),
-        CurrencyOption("British Pound", "GBP", BigDecimal("0.79")),
-        CurrencyOption("Japanese Yen", "JPY", BigDecimal("144.85")),
-        CurrencyOption("UAE Dirham", "AED", BigDecimal("3.67")),
-        CurrencyOption("Canadian Dollar", "CAD", BigDecimal("1.36")),
-        CurrencyOption("Australian Dollar", "AUD", BigDecimal("1.51")),
+        CurrencyOption("US Dollar", "USD"),
+        CurrencyOption("Indian Rupee", "INR"),
+        CurrencyOption("Euro", "EUR"),
+        CurrencyOption("British Pound", "GBP"),
+        CurrencyOption("Japanese Yen", "JPY"),
+        CurrencyOption("UAE Dirham", "AED"),
+        CurrencyOption("Canadian Dollar", "CAD"),
+        CurrencyOption("Australian Dollar", "AUD"),
     )
 
     private var currentInput = "100"
     private var lastUpdatedText = ""
+    private var liveRate: FxRate? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppTheme.applySavedMode(this)
@@ -45,7 +61,7 @@ class CurrencyConverterActivity : AppCompatActivity() {
         binding.btnClear.setOnClickListener { clearAll() }
         binding.btnBackspace.setOnClickListener { backspacePressed() }
         binding.btnSwap.setOnClickListener { swapCurrencies() }
-        binding.btnRefresh.setOnClickListener { updateLastUpdated() }
+        binding.btnRefresh.setOnClickListener { fetchLiveRates() }
 
         binding.btn0.setOnClickListener { appendDigit("0") }
         binding.btn1.setOnClickListener { appendDigit("1") }
@@ -61,7 +77,7 @@ class CurrencyConverterActivity : AppCompatActivity() {
         binding.btnDecimal.setOnClickListener { appendDecimal() }
 
         setupCurrencySpinners()
-        updateLastUpdated()
+        fetchLiveRates()
         renderDisplay()
     }
 
@@ -78,10 +94,10 @@ class CurrencyConverterActivity : AppCompatActivity() {
         binding.toCurrencySpinner.setSelection(1)
 
         binding.fromCurrencySpinner.onItemSelectedListener = SimpleItemSelectedListener {
-            renderDisplay()
+            fetchLiveRates()
         }
         binding.toCurrencySpinner.onItemSelectedListener = SimpleItemSelectedListener {
-            renderDisplay()
+            fetchLiveRates()
         }
     }
 
@@ -128,7 +144,7 @@ class CurrencyConverterActivity : AppCompatActivity() {
         val to = binding.toCurrencySpinner.selectedItemPosition
         binding.fromCurrencySpinner.setSelection(to)
         binding.toCurrencySpinner.setSelection(from)
-        renderDisplay()
+        fetchLiveRates()
     }
 
     private fun updateLastUpdated() {
@@ -157,10 +173,9 @@ class CurrencyConverterActivity : AppCompatActivity() {
         }
     }
 
-    private fun convert(amount: BigDecimal, from: CurrencyOption, to: CurrencyOption): BigDecimal {
-        if (from.code == to.code) return amount
-        val usdValue = amount.divide(from.rateToUsd, 10, RoundingMode.HALF_UP)
-        return usdValue.multiply(to.rateToUsd).setScale(4, RoundingMode.HALF_UP)
+    private fun convert(amount: BigDecimal): BigDecimal {
+        val rate = liveRate?.rate ?: return BigDecimal.ZERO
+        return amount.multiply(rate).setScale(4, RoundingMode.HALF_UP)
     }
 
     private fun formatAmount(value: BigDecimal): String {
@@ -185,11 +200,71 @@ class CurrencyConverterActivity : AppCompatActivity() {
         val from = selectedFrom()
         val to = selectedTo()
         val amount = parsedAmount()
-        val converted = convert(amount, from, to)
+        val converted = convert(amount)
 
         binding.fromAmount.text = formatEditableAmount(currentInput)
         binding.fromCurrencySpinner.prompt = from.toString()
-        binding.toAmount.text = formatAmount(converted)
+        binding.toAmount.text = if (liveRate == null) "--" else formatAmount(converted)
         binding.toCurrencySpinner.prompt = to.toString()
+    }
+
+    private fun fetchLiveRates() {
+        binding.lastUpdated.text = "Loading live rates..."
+        val fromCode = selectedFrom().code
+        val toCode = selectedTo().code
+        if (fromCode == toCode) {
+            liveRate = FxRate(
+                fromCode = fromCode,
+                toCode = toCode,
+                rate = BigDecimal.ONE,
+                fetchedAtLabel = SimpleDateFormat("M/d/yyyy, h:mm a", Locale.getDefault()).format(Date()),
+            )
+            lastUpdatedText = liveRate!!.fetchedAtLabel
+            binding.lastUpdated.text = "Last updated: ${liveRate!!.fetchedAtLabel}"
+            renderDisplay()
+            return
+        }
+
+        networkExecutor.execute {
+            val result = runCatching {
+                val apiUrl = "https://api.frankfurter.dev/v2/rate/$fromCode/$toCode"
+                val connection = (URL(apiUrl).openConnection() as HttpURLConnection).apply {
+                    requestMethod = "GET"
+                    connectTimeout = 10_000
+                    readTimeout = 10_000
+                }
+                val body = connection.inputStream.bufferedReader().use { it.readText() }
+                connection.disconnect()
+                parseRate(body, fromCode, toCode)
+            }.getOrElse {
+                mainHandler.post {
+                    Toast.makeText(this, "Unable to load live rate", Toast.LENGTH_SHORT).show()
+                    binding.lastUpdated.text = "Last updated: unavailable"
+                    binding.toAmount.text = "--"
+                }
+                null
+            }
+
+            mainHandler.post {
+                if (result != null) {
+                    liveRate = result
+                    lastUpdatedText = result.fetchedAtLabel
+                    binding.lastUpdated.text = "Last updated: ${result.fetchedAtLabel}"
+                    renderDisplay()
+                }
+            }
+        }
+    }
+
+    private fun parseRate(json: String, fromCode: String, toCode: String): FxRate {
+        val root = JSONObject(json)
+        val fetchedAtLabel = root.optString("date").takeIf { it.isNotBlank() }
+            ?: SimpleDateFormat("M/d/yyyy, h:mm a", Locale.getDefault()).format(Date())
+        return FxRate(
+            fromCode = fromCode,
+            toCode = toCode,
+            rate = BigDecimal.valueOf(root.getDouble("rate")),
+            fetchedAtLabel = fetchedAtLabel,
+        )
     }
 }
