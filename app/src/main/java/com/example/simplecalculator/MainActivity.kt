@@ -114,7 +114,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateScientificPanel() {
         binding.scientificPanel.visibility = if (scientificMode) View.VISIBLE else View.GONE
-        binding.btnScientificMode.text = if (scientificMode) "123" else "√π"
         binding.btnAngleMode.text = if (angleModeDegrees) "deg" else "rad"
         binding.btnInverse.text = if (inverseMode) "inv*" else "inv"
         updateTopBarDescriptions()

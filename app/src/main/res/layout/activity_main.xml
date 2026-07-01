@@ -31,27 +31,21 @@
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            <com.google.android.material.button.MaterialButton
+            <FrameLayout
                 android:id="@+id/btnScientificMode"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
-                android:insetLeft="0dp"
-                android:insetTop="0dp"
-                android:insetRight="0dp"
-                android:insetBottom="0dp"
-                app:backgroundTint="@color/card_background"
-                app:cornerRadius="22dp"
-                app:icon="@drawable/calculator"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp"
-                app:iconTint="@null"
-                android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true"
-                app:strokeWidth="0dp" />
-            </RelativeLayout>
+                android:background="@drawable/bg_top_bar_icon_button"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/btnScientificModeIcon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/calculator" />
+            </FrameLayout>
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnMoreCalculators"
                 android:layout_width="45dp"
