@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:columnCount="2"
-            android:rowCount="4">
+            android:rowCount="5">
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardGst"
@@ -293,6 +293,42 @@
                         android:layout_marginTop="10dp"
                         android:gravity="center"
                         android:text="Currency Converter"
+                        android:textColor="@color/display_text"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardPrivateVault"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="8dp"
+                app:cardBackgroundColor="@color/card_background"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LOCK"
+                        android:textColor="@color/display_text"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:text="Private Vault"
                         android:textColor="@color/display_text"
                         android:textSize="18sp"
                         android:textStyle="bold" />

@@ -11,6 +11,10 @@ It includes a splash screen, dark/light theme support, and a calculator UI inspi
 - Extra actions: `AC`, `%`, `00`, backspace, decimal, equals
 - Live preview result below the main expression
 - Custom app icon and theme toggle icon
+- Number system conversion screen with binary input support
+- Currency converter screen with live exchange-rate fetching
+- Age calculator with improved next-birthday calculation
+- Transparent private vault with passcode protection, encrypted imports, folders, move/copy, and trash restore
 
 ## Screenshots
 
@@ -25,6 +29,14 @@ It includes a splash screen, dark/light theme support, and a calculator UI inspi
 ### Calculator - Dark Theme
 
 <img src="docs/screenshots/calculator-dark.png" alt="Calculator Dark Theme" width="200" height="400" />
+
+## Recent Updates
+
+- Added a dedicated number system converter screen that accepts only valid binary input and shows the decimal result live.
+- Added a currency converter screen that fetches live exchange rates and supports swapping currencies.
+- Fixed the age calculator next-birthday calculation so it uses the correct upcoming birthday date.
+- Improved the main calculator top bar icon so it stays centered inside the custom button background.
+- Added a transparent private vault screen for securely importing and managing files inside the app's private storage.
 
 ## Tech Stack
 
@@ -75,6 +87,7 @@ app/src/main/res/
 - The app uses ViewBinding instead of `findViewById`.
 - The launcher icon and splash artwork use the provided calculator image.
 - The footer text on the splash screen shows `Made By Ritesh ❤️`.
+- The newer converter screens are designed to match the same rounded-card style as the main calculator.
 
 ## License
 
