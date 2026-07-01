@@ -217,12 +217,13 @@
                         android:textColor="@color/secondary_text"
                         android:textSize="14sp" />
 
-                    <LinearLayout
-                        android:id="@+id/vaultListContainer"
+                    <GridLayout
+                        android:id="@+id/vaultGridContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="12dp" />
+                        android:layout_marginTop="12dp"
+                        android:columnCount="2"
+                        android:useDefaultMargins="false" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

@@ -6,16 +6,24 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.content.Intent
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.media.MediaScannerConnection
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.text.InputType
 import android.view.View
+import android.view.ViewGroup
+import android.widget.GridLayout
+import android.widget.ImageView
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -35,6 +43,8 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.UUID
 import java.util.Locale
+import java.util.LinkedHashMap
+import java.util.concurrent.Executors
 import android.webkit.MimeTypeMap
 import javax.crypto.CipherOutputStream
 import javax.crypto.CipherInputStream
@@ -61,6 +71,9 @@ class PrivateVaultActivity : AppCompatActivity() {
     private var pendingImportRemovesFromSource = true
     private var importFlowActive = false
     private var pendingDeleteToast: String? = null
+    private val thumbnailExecutor = Executors.newSingleThreadExecutor()
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val thumbnailCache = LinkedHashMap<String, Bitmap>(20, 0.75f, true)
 
     private val openDocumentLauncher = registerForActivityResult(
         ActivityResultContracts.OpenMultipleDocuments()
@@ -112,6 +125,11 @@ class PrivateVaultActivity : AppCompatActivity() {
         } else {
             updateLockedUi()
         }
+    }
+
+    override fun onDestroy() {
+        thumbnailExecutor.shutdownNow()
+        super.onDestroy()
     }
 
     private fun setupInitialState() {
@@ -346,7 +364,7 @@ class PrivateVaultActivity : AppCompatActivity() {
     }
 
     private fun renderEntries() {
-        binding.vaultListContainer.removeAllViews()
+        binding.vaultGridContainer.removeAllViews()
         val visibleEntries = entries.filter {
             if (currentFolder == "Trash") it.isTrashed else !it.isTrashed && it.folder == currentFolder
         }.sortedByDescending { it.createdAt }
@@ -361,17 +379,19 @@ class PrivateVaultActivity : AppCompatActivity() {
         }
 
         visibleEntries.forEach { entry ->
-            binding.vaultListContainer.addView(createEntryCard(entry))
+            binding.vaultGridContainer.addView(createEntryCard(entry))
         }
     }
 
     private fun createEntryCard(entry: VaultFileEntry): View {
         val card = MaterialCardView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { topMargin = dp(12) }
-            radius = dp(24).toFloat()
+            layoutParams = GridLayout.LayoutParams().apply {
+                width = 0
+                height = ViewGroup.LayoutParams.WRAP_CONTENT
+                columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                setMargins(dp(6), dp(6), dp(6), dp(6))
+            }
+            radius = dp(18).toFloat()
             cardElevation = 0f
             setCardBackgroundColor(getColor(R.color.card_background))
             isClickable = true
@@ -381,32 +401,64 @@ class PrivateVaultActivity : AppCompatActivity() {
 
         val container = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(18), dp(18), dp(18), dp(18))
+            setPadding(dp(10), dp(10), dp(10), dp(10))
+        }
+
+        val thumbnail = ImageView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(150)
+            )
+            scaleType = ImageView.ScaleType.CENTER_CROP
+            setBackgroundColor(getColor(R.color.screen_background))
+            tag = entry.id
+            setImageResource(
+                if (entry.isTrashed) android.R.drawable.ic_menu_delete
+                else android.R.drawable.ic_menu_gallery
+            )
+        }
+
+        if (VaultFilePreviewHelper.isImage(VaultFilePreviewHelper.mimeTypeFor(entry.originalName))) {
+            thumbnail.scaleType = ImageView.ScaleType.CENTER_CROP
+            loadEntryThumbnailAsync(entry, thumbnail)
+        } else {
+            thumbnail.scaleType = ImageView.ScaleType.CENTER_INSIDE
+            thumbnail.setPadding(dp(24), dp(24), dp(24), dp(24))
         }
 
         val title = MaterialTextView(this).apply {
             text = entry.originalName
             setTextColor(getColor(R.color.display_text))
-            textSize = 16f
+            textSize = 13f
             setTypeface(typeface, android.graphics.Typeface.BOLD)
+            maxLines = 1
+            ellipsize = android.text.TextUtils.TruncateAt.END
+            setPadding(0, dp(8), 0, 0)
         }
 
         val subtitle = MaterialTextView(this).apply {
             text = if (entry.isTrashed) "Trash" else "Folder: ${entry.folder}"
             setTextColor(getColor(R.color.secondary_text))
-            textSize = 13f
+            textSize = 11f
         }
 
         val actions = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
-            setPadding(0, dp(14), 0, 0)
+            setPadding(0, dp(10), 0, 0)
         }
 
-        val moveButton = MaterialButton(this).apply {
+ /*       val moveButton = MaterialButton(this).apply {
             text = if (entry.isTrashed) "Restore" else "Move"
             isAllCaps = false
+            minHeight = dp(34)
+            cornerRadius = dp(17)
+            insetTop = 0
+            insetBottom = 0
+            insetLeft = 0
+            insetRight = 0
             setBackgroundColor(getColor(R.color.screen_background))
             setTextColor(getColor(R.color.display_text))
+            textSize = 10f
             setOnClickListener {
                 if (entry.isTrashed) {
                     restoreEntry(entry)
@@ -419,20 +471,34 @@ class PrivateVaultActivity : AppCompatActivity() {
         val copyButton = MaterialButton(this).apply {
             text = "Copy"
             isAllCaps = false
+            minHeight = dp(34)
+            cornerRadius = dp(17)
+            insetTop = 0
+            insetBottom = 0
+            insetLeft = 0
+            insetRight = 0
             setBackgroundColor(getColor(R.color.screen_background))
             setTextColor(getColor(R.color.display_text))
+            textSize = 10f
             setOnClickListener {
                 if (!entry.isTrashed) {
                     showFolderActionDialog(entry, EntryAction.COPY)
                 }
             }
         }
-
+*/
         val deleteButton = MaterialButton(this).apply {
             text = if (entry.isTrashed) "Delete" else "Trash"
             isAllCaps = false
+            minHeight = dp(34)
+            cornerRadius = dp(17)
+            insetTop = 0
+            insetBottom = 0
+            insetLeft = 0
+            insetRight = 0
             setBackgroundColor(getColor(R.color.screen_background))
             setTextColor(getColor(R.color.display_text))
+            textSize = 10f
             setOnClickListener {
                 if (entry.isTrashed) {
                     deleteEntryPermanently(entry)
@@ -442,19 +508,78 @@ class PrivateVaultActivity : AppCompatActivity() {
             }
         }
 
-        listOf(moveButton, copyButton, deleteButton).forEachIndexed { index, button ->
-            (button.layoutParams as? LinearLayout.LayoutParams)?.let { }
-            val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
-                if (index > 0) marginStart = dp(8)
+        listOf(/*moveButton, copyButton,*/ deleteButton).forEachIndexed { index, button ->
+            val params = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
+                if (index > 0) marginStart = dp(6)
             }
             actions.addView(button, params)
         }
 
+        container.addView(thumbnail)
         container.addView(title)
         container.addView(subtitle)
         container.addView(actions)
         card.addView(container)
         return card
+    }
+
+    private fun loadEntryThumbnailAsync(entry: VaultFileEntry, imageView: ImageView) {
+        synchronized(thumbnailCache) {
+            thumbnailCache[entry.id]?.let { cached ->
+                imageView.setImageBitmap(cached)
+                imageView.setPadding(0, 0, 0, 0)
+                imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+                return
+            }
+        }
+
+        thumbnailExecutor.execute {
+            val bitmap = loadEntryThumbnail(entry)
+            if (bitmap != null) {
+                synchronized(thumbnailCache) {
+                    if (thumbnailCache.size >= 20) {
+                        val eldest = thumbnailCache.entries.iterator().next().key
+                        thumbnailCache.remove(eldest)
+                    }
+                    thumbnailCache[entry.id] = bitmap
+                }
+            }
+
+            mainHandler.post {
+                if (imageView.tag == entry.id) {
+                    if (bitmap != null) {
+                        imageView.setImageBitmap(bitmap)
+                        imageView.setPadding(0, 0, 0, 0)
+                    } else {
+                        imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                        imageView.setPadding(dp(24), dp(24), dp(24), dp(24))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun loadEntryThumbnail(entry: VaultFileEntry): Bitmap? {
+        val mimeType = VaultFilePreviewHelper.mimeTypeFor(entry.originalName)
+        if (!VaultFilePreviewHelper.isImage(mimeType)) return null
+        val tempFile = VaultFilePreviewHelper.decryptToTempFile(this, entry) ?: return null
+        return runCatching {
+            decodeBitmap(tempFile)
+        }.getOrNull().also {
+            tempFile.delete()
+        }
+    }
+
+    private fun decodeBitmap(file: File): Bitmap? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val source = ImageDecoder.createSource(file)
+            ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
+                decoder.isMutableRequired = false
+                decoder.setTargetSize(dp(240), dp(240))
+            }
+        } else {
+            BitmapFactory.decodeFile(file.absolutePath)
+        }
     }
 
     private fun moveToTrash(entry: VaultFileEntry) {
