@@ -27,6 +27,7 @@ class NumberSystemConverterActivity : AppCompatActivity() {
         binding.btnCopy.setOnClickListener { copyToClipboard(getString(R.string.app_name), currentShareText()) }
         binding.btnShare.setOnClickListener { sharePlainText(getString(R.string.app_name), currentShareText()) }
         binding.btnSave.setOnClickListener { saveCurrentResult() }
+        AdManager.loadBanner(this, binding.bannerAdContainer)
 
         renderDisplay()
     }

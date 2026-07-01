@@ -40,6 +40,9 @@ import javax.crypto.CipherOutputStream
 import javax.crypto.CipherInputStream
 
 class PrivateVaultActivity : AppCompatActivity() {
+    private companion object {
+        const val IMPORT_BATCH_LIMIT = 3
+    }
 
     private enum class EntryAction { MOVE, COPY }
     private data class SharedImportResult(
@@ -54,13 +57,16 @@ class PrivateVaultActivity : AppCompatActivity() {
     private var folders = mutableListOf<String>()
     private var entries = mutableListOf<VaultFileEntry>()
     private var pendingSharedUris = mutableListOf<Uri>()
+    private var pendingImportUris = mutableListOf<Uri>()
+    private var pendingImportRemovesFromSource = true
+    private var importFlowActive = false
     private var pendingDeleteToast: String? = null
 
     private val openDocumentLauncher = registerForActivityResult(
         ActivityResultContracts.OpenMultipleDocuments()
     ) { uris ->
         if (!uris.isNullOrEmpty()) {
-            importFiles(uris)
+            startImportFlow(uris, removeFromSource = true)
         }
     }
 
@@ -87,6 +93,7 @@ class PrivateVaultActivity : AppCompatActivity() {
         binding.btnImportFile.setOnClickListener { openDocumentLauncher.launch(arrayOf("image/*")) }
         binding.btnNewFolder.setOnClickListener { promptNewFolder() }
         binding.btnLockVault.setOnClickListener { lockVault() }
+        AdManager.loadBanner(this, binding.bannerAdContainer)
 
         setupInitialState()
         handleIncomingIntent(intent)
@@ -233,8 +240,42 @@ class PrivateVaultActivity : AppCompatActivity() {
 
         val sharedUris = pendingSharedUris.toList()
         pendingSharedUris.clear()
+        startImportFlow(sharedUris, removeFromSource = true)
+    }
 
-        val result = importSharedUris(sharedUris)
+    private fun startImportFlow(uris: List<Uri>, removeFromSource: Boolean) {
+        if (uris.isEmpty()) {
+            loadVault()
+            return
+        }
+
+        pendingImportUris.clear()
+        pendingImportUris.addAll(uris.distinct())
+        pendingImportRemovesFromSource = removeFromSource
+
+        if (!importFlowActive) {
+            importFlowActive = true
+            consumeImportQueue()
+        }
+    }
+
+    private fun consumeImportQueue() {
+        if (!isUnlocked) {
+            importFlowActive = false
+            return
+        }
+
+        if (pendingImportUris.isEmpty()) {
+            importFlowActive = false
+            loadVault()
+            return
+        }
+
+        val batchSize = minOf(IMPORT_BATCH_LIMIT, pendingImportUris.size)
+        val batch = pendingImportUris.take(batchSize)
+        pendingImportUris = pendingImportUris.drop(batchSize).toMutableList()
+
+        val result = importUrisBatch(batch, pendingImportRemovesFromSource)
         loadVault()
 
         val message = buildString {
@@ -243,72 +284,47 @@ class PrivateVaultActivity : AppCompatActivity() {
                 if (result.importedCount > 1) append("s")
                 append(" to vault")
             } else {
-                append("No shared files were imported")
+                append("No files were imported")
             }
-            if (result.failedCount > 0) {
-                append(". ${result.failedCount} file")
-                if (result.failedCount > 1) append("s")
-                append(" could not be removed from system storage")
+            if (pendingImportUris.isNotEmpty()) {
+                append(". Watch a rewarded ad to import ${pendingImportUris.size} more")
+                if (pendingImportUris.size > 1) append(" files")
             }
         }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
 
-        if (sharedUris.isNotEmpty()) {
-            requestDeleteOriginals(sharedUris, message)
+        if (pendingImportUris.isNotEmpty()) {
+            importFlowActive = false
+            promptRewardToContinue()
         } else {
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+            importFlowActive = false
         }
     }
 
-    private fun importSharedUris(uris: List<Uri>): SharedImportResult {
-        var importedCount = 0
-        var removedCount = 0
-        var failedCount = 0
-
-        uris.forEach { uri ->
-            val imported = importSharedUri(uri, removeFromSource = false, showToast = false)
-            if (imported) {
-                importedCount++
-            } else {
-                failedCount++
-            }
-        }
-
-        return SharedImportResult(importedCount, removedCount, failedCount)
-    }
-
-    private fun requestDeleteOriginals(uris: List<Uri>, pendingMessage: String) {
-        if (uris.isEmpty()) {
-            Toast.makeText(this, pendingMessage, Toast.LENGTH_LONG).show()
-            return
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            pendingDeleteToast = pendingMessage
-            runCatching {
-                val request = MediaStore.createDeleteRequest(contentResolver, uris)
-                deleteSharedLauncher.launch(
-                    IntentSenderRequest.Builder(request.intentSender).build()
-                )
-            }.onFailure {
-                pendingDeleteToast = null
-                val removed = uris.count { tryRemoveSource(it) }
-                val extra = if (removed > 0) {
-                    val plural = if (removed > 1) "s" else ""
-                    ". Removed $removed original file$plural from system storage"
-                } else {
-                    ". Original files could not be removed from system storage"
+    private fun promptRewardToContinue() {
+        var rewardEarned = false
+        val shown = AdManager.showRewarded(
+            this,
+            onRewardEarned = {
+                rewardEarned = true
+            },
+            onFinished = {
+                if (rewardEarned) {
+                    importFlowActive = true
+                    consumeImportQueue()
+                } else if (pendingImportUris.isNotEmpty()) {
+                    pendingImportUris.clear()
+                    Toast.makeText(
+                        this,
+                        "Watch a rewarded ad next time to import more than 3 files.",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
-                Toast.makeText(this, pendingMessage + extra, Toast.LENGTH_LONG).show()
             }
-        } else {
-            val removed = uris.count { tryRemoveSource(it) }
-            val extra = if (removed > 0) {
-                val plural = if (removed > 1) "s" else ""
-                ". Removed $removed original file$plural from system storage"
-            } else {
-                ". Original files could not be removed from system storage"
-            }
-            Toast.makeText(this, pendingMessage + extra, Toast.LENGTH_LONG).show()
+        )
+
+        if (!shown) {
+            importFlowActive = false
         }
     }
 
@@ -534,23 +550,18 @@ class PrivateVaultActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun importFiles(uris: List<Uri>) {
-        if (uris.size == 1) {
-            importSharedUri(uris.first(), removeFromSource = true, showToast = true)
-            return
-        }
-
+    private fun importUrisBatch(uris: List<Uri>, removeFromSource: Boolean): SharedImportResult {
         var importedCount = 0
         var removedCount = 0
         var failedCount = 0
 
         uris.forEach { uri ->
-            val imported = importSharedUri(uri, removeFromSource = false, showToast = false)
+            val imported = importVaultUri(uri, showToast = false)
             if (imported) {
                 importedCount++
-                if (tryRemoveSource(uri)) {
+                if (removeFromSource && tryRemoveSource(uri)) {
                     removedCount++
-                } else {
+                } else if (removeFromSource) {
                     failedCount++
                 }
             } else {
@@ -558,27 +569,10 @@ class PrivateVaultActivity : AppCompatActivity() {
             }
         }
 
-        loadVault()
-
-        val message = buildString {
-            append("Imported $importedCount file")
-            if (importedCount != 1) append("s")
-            append(" to vault")
-            if (removedCount > 0) {
-                append(". Removed $removedCount original file")
-                if (removedCount != 1) append("s")
-                append(" from system storage")
-            }
-            if (failedCount > 0) {
-                append(". $failedCount file")
-                if (failedCount != 1) append("s")
-                append(" could not be removed from system storage")
-            }
-        }
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        return SharedImportResult(importedCount, removedCount, failedCount)
     }
 
-    private fun importSharedUri(uri: Uri, removeFromSource: Boolean, showToast: Boolean): Boolean {
+    private fun importVaultUri(uri: Uri, showToast: Boolean): Boolean {
         if (!isUnlocked) return false
         val name = queryDisplayName(uri) ?: "Imported File"
         val newId = UUID.randomUUID().toString()
@@ -596,10 +590,6 @@ class PrivateVaultActivity : AppCompatActivity() {
         } ?: run {
             Toast.makeText(this, "Unable to read file", Toast.LENGTH_SHORT).show()
             return false
-        }
-
-        if (removeFromSource) {
-            tryRemoveSource(uri)
         }
 
         entries.add(

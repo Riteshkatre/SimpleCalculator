@@ -16,9 +16,21 @@ class SplashActivity : AppCompatActivity() {
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        Handler(Looper.getMainLooper()).postDelayed({
+        val handler = Handler(Looper.getMainLooper())
+        var navigated = false
+        val navigate = Runnable {
+            if (navigated) return@Runnable
+            navigated = true
             startActivity(Intent(this, MainActivity::class.java))
             finish()
-        }, 1200)
+        }
+
+        val appOpenShown = AdManager.showAppOpen(this) {
+            handler.removeCallbacks(navigate)
+            navigate.run()
+        }
+        if (!appOpenShown) {
+            handler.postDelayed(navigate, 1200)
+        }
     }
 }

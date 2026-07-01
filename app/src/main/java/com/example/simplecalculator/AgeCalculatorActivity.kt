@@ -23,6 +23,7 @@ class AgeCalculatorActivity : AppCompatActivity() {
         binding.btnCopy.setOnClickListener { copyToClipboard(getString(R.string.app_name), binding.resultSummary.text.toString()) }
         binding.btnShare.setOnClickListener { sharePlainText(getString(R.string.app_name), binding.resultSummary.text.toString()) }
         binding.btnSave.setOnClickListener { saveResult() }
+        AdManager.loadBanner(this, binding.bannerAdContainer)
     }
 
     private fun pickDate() {

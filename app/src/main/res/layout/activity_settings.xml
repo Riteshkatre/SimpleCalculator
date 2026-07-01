@@ -87,7 +87,25 @@
                         android:text="Dark theme"
                         android:textColor="@color/display_text" />
                 </RadioGroup>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnWatchRewardedAd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/watch_rewarded_ad"
+                    android:textAllCaps="false"
+                    android:textColor="@color/display_text"
+                    app:backgroundTint="@color/screen_background"
+                    app:cornerRadius="18dp"
+                    app:strokeWidth="0dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <FrameLayout
+            android:id="@+id/bannerAdContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" />
     </LinearLayout>
 </ScrollView>

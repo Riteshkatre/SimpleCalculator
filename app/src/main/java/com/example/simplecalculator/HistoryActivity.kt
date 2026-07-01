@@ -21,6 +21,7 @@ class HistoryActivity : AppCompatActivity() {
 
         binding.btnBack.setOnClickListener { finish() }
         binding.btnClearAll.setOnClickListener { confirmClearAll() }
+        AdManager.loadBanner(this, binding.bannerAdContainer)
         renderHistory()
     }
 

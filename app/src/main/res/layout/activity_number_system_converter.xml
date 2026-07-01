@@ -464,5 +464,11 @@
                 app:cornerRadius="38dp"
                 app:strokeWidth="0dp" />
         </GridLayout>
+
+        <FrameLayout
+            android:id="@+id/bannerAdContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

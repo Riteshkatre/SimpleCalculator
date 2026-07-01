@@ -1,6 +1,7 @@
 package com.riteshkatre.simplecalculator
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.riteshkatre.simplecalculator.databinding.ActivitySettingsBinding
@@ -31,5 +32,12 @@ class SettingsActivity : AppCompatActivity() {
             }
             AppTheme.setThemeMode(this, mode)
         }
+
+        binding.btnWatchRewardedAd.setOnClickListener {
+            AdManager.showRewarded(this, onRewardEarned = {
+                Toast.makeText(this, "Reward earned", Toast.LENGTH_SHORT).show()
+            })
+        }
+        AdManager.loadBanner(this, binding.bannerAdContainer)
     }
 }

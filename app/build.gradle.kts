@@ -41,6 +41,14 @@ android {
     }
 
     buildTypes {
+        debug {
+            resValue("string", "admob_app_id", "ca-app-pub-3940256099942544~3347511713")
+            resValue("string", "admob_banner_unit_id", "ca-app-pub-3940256099942544/6300978111")
+            resValue("string", "admob_interstitial_unit_id", "ca-app-pub-3940256099942544/1033173712")
+            resValue("string", "admob_rewarded_unit_id", "ca-app-pub-3940256099942544/5224354917")
+            resValue("string", "admob_native_unit_id", "ca-app-pub-3940256099942544/2247696110")
+            resValue("string", "admob_app_open_unit_id", "ca-app-pub-3940256099942544/3419835294")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -56,6 +64,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        resValues = true
     }
 }
 
@@ -65,6 +74,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation("com.google.android.gms:play-services-ads:25.4.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

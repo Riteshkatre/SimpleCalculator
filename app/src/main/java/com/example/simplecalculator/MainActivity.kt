@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.view.View
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.riteshkatre.simplecalculator.databinding.ActivityMainBinding
 import kotlin.math.PI
 
@@ -30,8 +33,21 @@ class MainActivity : AppCompatActivity() {
 
         bindTopBar()
         bindButtons()
+        setupBannerAd()
         updateScientificPanel()
         renderDisplay()
+    }
+
+    private fun setupBannerAd() {
+        val adView = AdView(this)
+        adView.adUnitId = getString(R.string.admob_banner_unit_id)
+        binding.bannerAdContainer.removeAllViews()
+        binding.bannerAdContainer.addView(adView)
+        binding.bannerAdContainer.post {
+            val widthDp = (binding.bannerAdContainer.width / resources.displayMetrics.density).toInt()
+            adView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, widthDp))
+            adView.loadAd(AdRequest.Builder().build())
+        }
     }
 
     private fun bindTopBar() {

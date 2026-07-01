@@ -77,6 +77,7 @@ class CurrencyConverterActivity : AppCompatActivity() {
         binding.btnDecimal.setOnClickListener { appendDecimal() }
 
         setupCurrencySpinners()
+        AdManager.loadBanner(this, binding.bannerAdContainer)
         fetchLiveRates()
         renderDisplay()
     }
