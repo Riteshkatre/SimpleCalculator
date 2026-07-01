@@ -51,6 +51,7 @@ class AgeCalculatorActivity : AppCompatActivity() {
 
         val today = Calendar.getInstance()
         val birth = dob.clone() as Calendar
+        val nextBirthdayDate = dob.clone() as Calendar
         var years = today.get(Calendar.YEAR) - birth.get(Calendar.YEAR)
         var months = today.get(Calendar.MONTH) - birth.get(Calendar.MONTH)
         var days = today.get(Calendar.DAY_OF_MONTH) - birth.get(Calendar.DAY_OF_MONTH)
@@ -65,17 +66,51 @@ class AgeCalculatorActivity : AppCompatActivity() {
             years -= 1
         }
 
-        val nextBirthday = birth.clone() as Calendar
-        nextBirthday.add(Calendar.YEAR, years + 1)
-        val daysUntilBirthday = ((nextBirthday.timeInMillis - today.timeInMillis) / (24L * 60L * 60L * 1000L)).coerceAtLeast(0L)
+        nextBirthdayDate.set(Calendar.YEAR, today.get(Calendar.YEAR))
+        if (isBirthdayPassedThisYear(today, nextBirthdayDate)) {
+            nextBirthdayDate.add(Calendar.YEAR, 1)
+        }
+        val daysUntilBirthday = daysBetween(today, nextBirthdayDate)
 
         binding.resultYears.text = years.toString()
         binding.resultMonths.text = months.toString()
         binding.resultDays.text = days.toString()
-        binding.resultNextBirthday.text = "$daysUntilBirthday days"
+        binding.resultNextBirthday.text = if (daysUntilBirthday == 1L) "1 day" else "$daysUntilBirthday days"
         binding.resultSummary.text = "Age: $years years, $months months, $days days"
         binding.resultCard.visibility = android.view.View.VISIBLE
         HistoryStore.add(this, "DOB ${binding.dateText.text}", binding.resultSummary.text.toString())
+    }
+
+    private fun isBirthdayPassedThisYear(today: Calendar, birthdayThisYear: Calendar): Boolean {
+        val todayNoTime = today.clone() as Calendar
+        todayNoTime.set(Calendar.HOUR_OF_DAY, 0)
+        todayNoTime.set(Calendar.MINUTE, 0)
+        todayNoTime.set(Calendar.SECOND, 0)
+        todayNoTime.set(Calendar.MILLISECOND, 0)
+
+        val birthdayNoTime = birthdayThisYear.clone() as Calendar
+        birthdayNoTime.set(Calendar.HOUR_OF_DAY, 0)
+        birthdayNoTime.set(Calendar.MINUTE, 0)
+        birthdayNoTime.set(Calendar.SECOND, 0)
+        birthdayNoTime.set(Calendar.MILLISECOND, 0)
+
+        return birthdayNoTime.before(todayNoTime)
+    }
+
+    private fun daysBetween(start: Calendar, end: Calendar): Long {
+        val startNoTime = start.clone() as Calendar
+        startNoTime.set(Calendar.HOUR_OF_DAY, 0)
+        startNoTime.set(Calendar.MINUTE, 0)
+        startNoTime.set(Calendar.SECOND, 0)
+        startNoTime.set(Calendar.MILLISECOND, 0)
+
+        val endNoTime = end.clone() as Calendar
+        endNoTime.set(Calendar.HOUR_OF_DAY, 0)
+        endNoTime.set(Calendar.MINUTE, 0)
+        endNoTime.set(Calendar.SECOND, 0)
+        endNoTime.set(Calendar.MILLISECOND, 0)
+
+        return ((endNoTime.timeInMillis - startNoTime.timeInMillis) / (24L * 60L * 60L * 1000L)).coerceAtLeast(0L)
     }
 
     private fun saveResult() {
