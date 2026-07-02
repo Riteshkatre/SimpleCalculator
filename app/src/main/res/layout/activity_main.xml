@@ -83,6 +83,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:gravity="end"
+                    android:maxLines="3"
                     android:includeFontPadding="false"
                     android:textColor="@color/secondary_text"
                     android:textSize="@dimen/_22ssp"
