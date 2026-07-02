@@ -43,6 +43,9 @@
             android:name="com.riteshkatre.simplecalculator.CalculatorsActivity"
             android:exported="false" />
         <activity
+            android:name="com.riteshkatre.simplecalculator.ScientificCalculatorActivity"
+            android:exported="false" />
+        <activity
             android:name="com.riteshkatre.simplecalculator.GstCalculatorActivity"
             android:exported="false" />
         <activity

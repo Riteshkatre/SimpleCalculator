@@ -3,10 +3,10 @@ package com.riteshkatre.simplecalculator
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import com.google.android.gms.ads.AdListener
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
+import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.nativead.NativeAd
 import com.riteshkatre.simplecalculator.databinding.ActivityCalculatorsBinding
@@ -32,6 +32,8 @@ class CalculatorsActivity : AppCompatActivity() {
         binding.cardNumberSystem.setOnClickListener { open(NumberSystemConverterActivity::class.java) }
         binding.cardCurrency.setOnClickListener { open(CurrencyConverterActivity::class.java) }
         binding.cardPrivateVault.setOnClickListener { open(PrivateVaultActivity::class.java) }
+        binding.cardScientificMode.setOnClickListener { open(ScientificCalculatorActivity::class.java) }
+
         loadNativeAd()
     }
 

@@ -1,64 +1,30 @@
 package com.riteshkatre.simplecalculator
 
-import android.content.Intent
 import android.os.Bundle
-import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
-import com.riteshkatre.simplecalculator.databinding.ActivityMainBinding
+import com.riteshkatre.simplecalculator.databinding.ActivityScientificCalculatorBinding
+import kotlin.math.PI
 
-class MainActivity : AppCompatActivity() {
+class ScientificCalculatorActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityScientificCalculatorBinding
 
     private var currentInput = "0"
     private var leftOperand: Double? = null
     private var pendingOperator: String? = null
     private var justEvaluated = false
+    private var angleModeDegrees = true
+    private var inverseMode = false
     private var lastShareExpression = ""
     private var lastShareResult = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppTheme.applySavedMode(this)
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityScientificCalculatorBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        bindTopBar()
-        bindButtons()
-        setupBannerAd()
-        renderDisplay()
-    }
-
-    private fun setupBannerAd() {
-        AdManager.loadBanner(this, binding.bannerAdContainer)
-    }
-
-    private fun bindTopBar() {
-        binding.btnMoreCalculators.setOnClickListener {
-            startActivity(Intent(this, CalculatorsActivity::class.java))
-        }
-
-        binding.btnOverflowMenu.setOnClickListener { anchor ->
-            val popup = PopupMenu(this, anchor)
-            popup.menuInflater.inflate(R.menu.main_overflow_menu, popup.menu)
-            popup.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.menu_history -> {
-                        startActivity(Intent(this, HistoryActivity::class.java))
-                        true
-                    }
-                    R.id.menu_settings -> {
-                        startActivity(Intent(this, SettingsActivity::class.java))
-                        true
-                    }
-                    else -> false
-                }
-            }
-            popup.show()
-        }
-    }
-
-    private fun bindButtons() {
+        binding.btnBack.setOnClickListener { finish() }
         binding.btn0.setOnClickListener { onDigitPressed("0") }
         binding.btn1.setOnClickListener { onDigitPressed("1") }
         binding.btn2.setOnClickListener { onDigitPressed("2") }
@@ -84,6 +50,35 @@ class MainActivity : AppCompatActivity() {
         binding.btnCopyResult.setOnClickListener { copyCurrentResult() }
         binding.btnShareResult.setOnClickListener { shareCurrentResult() }
         binding.btnSaveResult.setOnClickListener { saveCurrentResult() }
+
+        binding.btnSin.setOnClickListener { applyScientific("sin") }
+        binding.btnCos.setOnClickListener { applyScientific("cos") }
+        binding.btnTan.setOnClickListener { applyScientific("tan") }
+        binding.btnLog.setOnClickListener { applyScientific("log") }
+        binding.btnLn.setOnClickListener { applyScientific("ln") }
+        binding.btnSquare.setOnClickListener { applyScientific("x²") }
+        binding.btnCube.setOnClickListener { applyScientific("x³") }
+        binding.btnSqrt.setOnClickListener { applyScientific("√") }
+        binding.btnReciprocal.setOnClickListener { applyScientific("1/x") }
+        binding.btnFactorial.setOnClickListener { applyScientific("!") }
+        binding.btnPi.setOnClickListener { insertConstantPI() }
+        binding.btnAngleMode.setOnClickListener {
+            angleModeDegrees = !angleModeDegrees
+            updateScientificState()
+        }
+        binding.btnInverse.setOnClickListener {
+            inverseMode = !inverseMode
+            updateScientificState()
+        }
+
+        AdManager.loadBanner(this, binding.bannerAdContainer)
+        updateScientificState()
+        renderDisplay()
+    }
+
+    private fun updateScientificState() {
+        binding.btnAngleMode.text = if (angleModeDegrees) "deg" else "rad"
+        binding.btnInverse.text = if (inverseMode) "inv*" else "inv"
     }
 
     private fun onDigitPressed(digit: String) {
@@ -206,6 +201,35 @@ class MainActivity : AppCompatActivity() {
         renderDisplay()
     }
 
+    private fun applyScientific(function: String) {
+        val value = currentInputValue()
+        val result = CalculatorMath.applyUnary(value, function, angleModeDegrees, inverseMode)
+        currentInput = CalculatorMath.formatNumber(result)
+        lastShareExpression = when (function) {
+            "x²" -> "${CalculatorMath.formatNumber(value)}²"
+            "x³" -> "${CalculatorMath.formatNumber(value)}³"
+            "1/x" -> "1 / ${CalculatorMath.formatNumber(value)}"
+            "!" -> "${CalculatorMath.formatNumber(value)}!"
+            "√" -> "√${CalculatorMath.formatNumber(value)}"
+            else -> "$function(${CalculatorMath.formatNumber(value)})"
+        }
+        lastShareResult = currentInput
+        HistoryStore.add(this, lastShareExpression, lastShareResult)
+
+        leftOperand = null
+        pendingOperator = null
+        justEvaluated = true
+        renderDisplay()
+    }
+
+    private fun insertConstantPI() {
+        currentInput = CalculatorMath.formatNumber(PI)
+        lastShareExpression = ""
+        lastShareResult = ""
+        justEvaluated = false
+        renderDisplay()
+    }
+
     private fun clearAll() {
         currentInput = "0"
         leftOperand = null
@@ -285,7 +309,5 @@ class MainActivity : AppCompatActivity() {
         binding.expressionText.text = buildExpressionText()
         binding.previewText.text = buildPreviewText()
         binding.previewText.alpha = if (binding.previewText.text.isNullOrEmpty()) 0f else 1f
-
-        val showCursor = pendingOperator != null || currentInput != "0" || justEvaluated
     }
 }

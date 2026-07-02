@@ -49,7 +49,6 @@
             <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_18sdp"
                 android:columnCount="2"
                 android:rowCount="5">
 
@@ -343,6 +342,43 @@
                             android:layout_marginTop="@dimen/_10sdp"
                             android:gravity="center"
                             android:text="Private \nVault"
+                            android:textColor="@color/display_text"
+                            android:textSize="@dimen/_14ssp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardScientificMode"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="@dimen/_8sdp"
+                    app:cardBackgroundColor="@color/card_background"
+                    app:cardCornerRadius="@dimen/_24sdp"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="@dimen/_18sdp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="+,-,*,/"
+                            android:textColor="@color/display_text"
+                            android:textSize="@dimen/_16ssp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_10sdp"
+                            android:gravity="center"
+                            android:text="Scientific \nMode"
                             android:textColor="@color/display_text"
                             android:textSize="@dimen/_14ssp"
                             android:textStyle="bold" />

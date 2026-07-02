@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/screen_background"
+    android:fillViewport="true"
     android:fitsSystemWindows="true"
-    tools:context=".MainActivity">
+    tools:context=".ScientificCalculatorActivity">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/_10sdp">
+        android:padding="@dimen/_16sdp">
 
         <LinearLayout
-            android:id="@+id/layoutMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/btnBack"
+                style="@style/TopBarIconButton"
+                android:contentDescription="@string/navigate_back"
+                app:srcCompat="@drawable/baseline_keyboard_backspace_24" />
+
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_12sdp"
                 android:layout_weight="1"
-                android:text="@string/calculator_title"
-                android:textColor="@color/secondary_text"
-                android:textSize="@dimen/_16ssp"
-                android:textStyle="bold" />
+                android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/btnMoreCalculators"
-                style="@style/TopBarIconButtonBg"
-                android:layout_marginStart="@dimen/_10sdp"
-                android:contentDescription="@string/open_calculators"
-                app:srcCompat="@drawable/dots" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Scientific Mode"
+                    android:textColor="@color/display_text"
+                    android:textSize="@dimen/_20ssp"
+                    android:textStyle="bold" />
 
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/btnOverflowMenu"
-                style="@style/TopBarIconButtonBg"
-                android:layout_marginStart="@dimen/_10sdp"
-                android:contentDescription="@string/open_menu"
-                app:srcCompat="@drawable/menu" />
-
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Advanced calculator tools"
+                    android:textColor="@color/secondary_text"
+                    android:textSize="@dimen/_12ssp" />
+            </LinearLayout>
         </LinearLayout>
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/materialCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/layoutMain"
-            android:layout_marginTop="@dimen/_18sdp"
+            android:layout_marginTop="@dimen/_16sdp"
             app:cardBackgroundColor="@color/card_background"
             app:cardCornerRadius="@dimen/_28sdp"
-            app:cardElevation="0dp"
-            app:strokeColor="@color/secondary_text"
-            app:strokeWidth="0dp">
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -71,8 +71,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="end"
                     android:includeFontPadding="false"
-                    android:text="0"
                     android:singleLine="true"
+                    android:text="0"
                     android:textColor="@color/display_text"
                     android:textSize="@dimen/_22ssp"
                     android:textStyle="bold" />
@@ -87,7 +87,6 @@
                     android:textColor="@color/secondary_text"
                     android:textSize="@dimen/_22ssp"
                     android:textStyle="bold" />
-
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -140,10 +139,113 @@
         </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_16sdp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnSin"
+                    style="@style/CalculatorNumberButton"
+                    android:text="sin" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnCos"
+                    style="@style/CalculatorNumberButton"
+                    android:text="cos" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnTan"
+                    style="@style/CalculatorNumberButton"
+                    android:text="tan" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnAngleMode"
+                    style="@style/CalculatorOperatorButton"
+                    android:text="deg" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnPi"
+                    style="@style/CalculatorNumberButton"
+                    android:text="π" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnLog"
+                    style="@style/CalculatorNumberButton"
+                    android:text="log" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnLn"
+                    style="@style/CalculatorNumberButton"
+                    android:text="ln" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnSquare"
+                    style="@style/CalculatorNumberButton"
+                    android:text="x²" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnCube"
+                    style="@style/CalculatorNumberButton"
+                    android:text="x³" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnSqrt"
+                    style="@style/CalculatorNumberButton"
+                    android:text="√" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnReciprocal"
+                    style="@style/CalculatorUtilityButton"
+                    android:text="1/x" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnFactorial"
+                    style="@style/CalculatorUtilityButton"
+                    android:text="!" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnInverse"
+                    style="@style/CalculatorUtilityButton"
+                    android:text="inv" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnClearScientific"
+                    style="@style/CalculatorUtilityButton"
+                    android:text="AC"
+                    android:visibility="gone" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnDummyScientific"
+                    style="@style/CalculatorUtilityButton"
+                    android:text=""
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/numberCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/bannerAdContainer"
             android:layout_marginTop="@dimen/_16sdp"
             android:layout_marginBottom="@dimen/_10sdp"
             android:orientation="vertical">
@@ -287,6 +389,6 @@
             android:id="@+id/bannerAdContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true" />
-    </RelativeLayout>
-</RelativeLayout>
+            android:layout_marginTop="@dimen/_16sdp" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
