@@ -7,6 +7,8 @@ import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.ParcelFileDescriptor
 import android.media.MediaPlayer
 import android.widget.MediaController
@@ -14,6 +16,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.riteshkatre.simplecalculator.databinding.ActivityVaultFileViewerBinding
 import java.io.File
+import java.util.concurrent.Executors
 
 class VaultFileViewerActivity : AppCompatActivity() {
 
@@ -26,6 +29,8 @@ class VaultFileViewerActivity : AppCompatActivity() {
     private var pdfRenderer: PdfRenderer? = null
     private var pdfPage: PdfRenderer.Page? = null
     private var pdfFileDescriptor: ParcelFileDescriptor? = null
+    private val previewExecutor = Executors.newSingleThreadExecutor()
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppTheme.applySavedMode(this)
@@ -54,18 +59,27 @@ class VaultFileViewerActivity : AppCompatActivity() {
         val mimeType = VaultFilePreviewHelper.mimeTypeFor(entry.originalName)
         binding.fileMime.text = mimeType
 
-        openedFile = VaultFilePreviewHelper.decryptToTempFile(this, entry)
-        if (openedFile == null || openedFile?.exists() != true) {
-            Toast.makeText(this, "Unable to decrypt file", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
+        showLoading(true)
+        previewExecutor.execute {
+            val decryptedFile = VaultFilePreviewHelper.decryptToTempFile(this, entry)
+            mainHandler.post {
+                if (isFinishing || isDestroyed) return@post
+                if (decryptedFile == null || !decryptedFile.exists()) {
+                    showLoading(false)
+                    Toast.makeText(this, "Unable to decrypt file", Toast.LENGTH_SHORT).show()
+                    finish()
+                    return@post
+                }
 
-        showPreview(openedFile!!, mimeType)
+                openedFile = decryptedFile
+                showPreview(decryptedFile, mimeType)
+            }
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        previewExecutor.shutdownNow()
         runCatching { pdfPage?.close() }
         runCatching { pdfRenderer?.close() }
         runCatching { pdfFileDescriptor?.close() }
@@ -85,27 +99,37 @@ class VaultFileViewerActivity : AppCompatActivity() {
     private fun showImage(file: File) {
         hideAllPreviews()
         binding.imagePreview.visibility = android.view.View.VISIBLE
-        loadBitmap(file)?.let {
-            binding.imagePreview.setImageBitmap(it)
-            binding.btnOpenExternally.visibility = android.view.View.GONE
-        } ?: run {
-            showUnsupported(VaultFilePreviewHelper.mimeTypeFor(file.name))
+        previewExecutor.execute {
+            val bitmap = loadBitmap(file)
+            mainHandler.post {
+                if (isFinishing || isDestroyed) return@post
+                if (bitmap != null) {
+                    binding.imagePreview.setImageBitmap(bitmap)
+                    binding.btnOpenExternally.visibility = android.view.View.GONE
+                } else {
+                    showUnsupported(VaultFilePreviewHelper.mimeTypeFor(file.name))
+                }
+                showLoading(false)
+            }
         }
     }
 
     private fun showVideo(file: File) {
         hideAllPreviews()
         binding.videoPreview.visibility = android.view.View.VISIBLE
+        showLoading(true)
         val controller = MediaController(this)
         controller.setAnchorView(binding.videoPreview)
         binding.videoPreview.setMediaController(controller)
         binding.videoPreview.setVideoPath(file.absolutePath)
         binding.videoPreview.setOnErrorListener { _, _, _ ->
+            showLoading(false)
             showUnsupported(VaultFilePreviewHelper.mimeTypeFor(file.name))
             true
         }
         binding.videoPreview.setOnPreparedListener { player: MediaPlayer ->
             player.isLooping = false
+            showLoading(false)
             binding.videoPreview.start()
         }
         binding.btnOpenExternally.visibility = android.view.View.GONE
@@ -119,20 +143,30 @@ class VaultFileViewerActivity : AppCompatActivity() {
             return
         }
 
-        runCatching {
-            pdfFileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
-            pdfRenderer = PdfRenderer(pdfFileDescriptor!!)
-            pdfPage = pdfRenderer!!.openPage(0)
-            val bitmap = Bitmap.createBitmap(
-                pdfPage!!.width,
-                pdfPage!!.height,
-                Bitmap.Config.ARGB_8888
-            )
-            pdfPage!!.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-            binding.imagePreview.setImageBitmap(bitmap)
-            binding.btnOpenExternally.visibility = android.view.View.VISIBLE
-        }.onFailure {
-            showUnsupported("application/pdf")
+        previewExecutor.execute {
+            val result = runCatching {
+                pdfFileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+                pdfRenderer = PdfRenderer(pdfFileDescriptor!!)
+                pdfPage = pdfRenderer!!.openPage(0)
+                val bitmap = Bitmap.createBitmap(
+                    pdfPage!!.width,
+                    pdfPage!!.height,
+                    Bitmap.Config.ARGB_8888
+                )
+                pdfPage!!.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                bitmap
+            }.getOrNull()
+
+            mainHandler.post {
+                if (isFinishing || isDestroyed) return@post
+                if (result != null) {
+                    binding.imagePreview.setImageBitmap(result)
+                    binding.btnOpenExternally.visibility = android.view.View.VISIBLE
+                } else {
+                    showUnsupported("application/pdf")
+                }
+                showLoading(false)
+            }
         }
     }
 
@@ -145,6 +179,7 @@ class VaultFileViewerActivity : AppCompatActivity() {
             "This file could not be displayed as text.\n\nYou can still open it externally."
         }
         binding.btnOpenExternally.visibility = android.view.View.VISIBLE
+        showLoading(false)
     }
 
     private fun showUnsupported(mimeType: String) {
@@ -152,6 +187,7 @@ class VaultFileViewerActivity : AppCompatActivity() {
         binding.unsupportedPreview.visibility = android.view.View.VISIBLE
         binding.unsupportedMessage.text = "Preview not available for $mimeType.\nYou can still open it externally."
         binding.btnOpenExternally.visibility = android.view.View.VISIBLE
+        showLoading(false)
     }
 
     private fun hideAllPreviews() {
@@ -159,6 +195,10 @@ class VaultFileViewerActivity : AppCompatActivity() {
         binding.videoPreview.visibility = android.view.View.GONE
         binding.textScroll.visibility = android.view.View.GONE
         binding.unsupportedPreview.visibility = android.view.View.GONE
+    }
+
+    private fun showLoading(show: Boolean) {
+        binding.loadingIndicator.visibility = if (show) android.view.View.VISIBLE else android.view.View.GONE
     }
 
     private fun openExternally() {

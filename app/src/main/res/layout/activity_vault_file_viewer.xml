@@ -67,6 +67,13 @@
                 android:minHeight="320dp"
                 android:padding="14dp">
 
+                <ProgressBar
+                    android:id="@+id/loadingIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
+
                 <ImageView
                     android:id="@+id/imagePreview"
                     android:layout_width="match_parent"
