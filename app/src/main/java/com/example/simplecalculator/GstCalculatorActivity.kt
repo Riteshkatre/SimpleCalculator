@@ -20,7 +20,7 @@ class GstCalculatorActivity : AppCompatActivity() {
         binding.btnShare.setOnClickListener { shareResult() }
         binding.btnSave.setOnClickListener { saveResult() }
 
-        listOf(binding.btn5, binding.btn12, binding.btn18, binding.btn28).forEach { button ->
+        listOf(binding.btn5, binding.btn12, binding.btn18).forEach { button ->
             button.setOnClickListener {
                 binding.rateInput.setText(button.text.toString().replace("%", ""))
             }

@@ -2,6 +2,7 @@ package com.riteshkatre.simplecalculator
 
 import android.app.Activity
 import android.content.Context
+import android.widget.FrameLayout
 import android.view.ViewGroup
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.AdError
@@ -16,6 +17,8 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import androidx.core.content.ContextCompat
+import com.google.android.material.card.MaterialCardView
 
 object AdManager {
 
@@ -53,10 +56,28 @@ object AdManager {
     }
 
     fun loadBanner(activity: Activity, container: ViewGroup) {
+        val bannerCard = MaterialCardView(activity).apply {
+            cardElevation = 0f
+            useCompatPadding = true
+            setCardBackgroundColor(ContextCompat.getColor(activity, R.color.card_background))
+            strokeWidth = (activity.resources.displayMetrics.density * 1f).toInt()
+            strokeColor = ContextCompat.getColor(activity, R.color.secondary_text)
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
         val adView = AdView(activity)
         adView.adUnitId = activity.getString(R.string.admob_banner_unit_id)
+        bannerCard.addView(
+            adView,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+            )
+        )
         container.removeAllViews()
-        container.addView(adView)
+        container.addView(bannerCard)
         container.post {
             val widthDp = (container.width / activity.resources.displayMetrics.density).toInt().coerceAtLeast(320)
             adView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, widthDp))

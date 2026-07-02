@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="@dimen/_16sdp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -21,50 +21,50 @@
             android:orientation="horizontal">
 
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/btnBack"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:src="@drawable/baseline_keyboard_backspace_24"/>
+                style="@style/TopBarIconButton"
+                android:contentDescription="@string/navigate_back"
+                app:srcCompat="@drawable/baseline_keyboard_backspace_24" />
 
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="@dimen/_12sdp"
                 android:text="Settings"
                 android:textColor="@color/display_text"
-                android:textSize="24sp"
+                android:textSize="@dimen/_20ssp"
                 android:textStyle="bold" />
         </LinearLayout>
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="@dimen/_18sdp"
             app:cardBackgroundColor="@color/card_background"
-            app:cardCornerRadius="24dp"
+            app:cardCornerRadius="@dimen/_24sdp"
             app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="@dimen/_18sdp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Theme"
                     android:textColor="@color/display_text"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/_18ssp"
                     android:textStyle="bold" />
 
                 <RadioGroup
                     android:id="@+id/themeGroup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp">
+                    android:layout_marginTop="@dimen/_12sdp">
 
                     <RadioButton
                         android:id="@+id/themeSystem"
@@ -92,12 +92,12 @@
                     android:id="@+id/btnWatchRewardedAd"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="@dimen/_16sdp"
                     android:text="@string/watch_rewarded_ad"
                     android:textAllCaps="false"
                     android:textColor="@color/display_text"
                     app:backgroundTint="@color/screen_background"
-                    app:cornerRadius="18dp"
+                    app:cornerRadius="@dimen/_18sdp"
                     app:strokeWidth="0dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -106,6 +106,6 @@
             android:id="@+id/bannerAdContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="@dimen/_16sdp" />
     </LinearLayout>
 </ScrollView>

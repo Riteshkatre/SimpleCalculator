@@ -73,7 +73,6 @@ class CurrencyConverterActivity : AppCompatActivity() {
         binding.btn7.setOnClickListener { appendDigit("7") }
         binding.btn8.setOnClickListener { appendDigit("8") }
         binding.btn9.setOnClickListener { appendDigit("9") }
-        binding.btnDoubleZero.setOnClickListener { appendDigit("00") }
         binding.btnDecimal.setOnClickListener { appendDecimal() }
 
         setupCurrencySpinners()

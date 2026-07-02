@@ -3,75 +3,75 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="10dp"
+    android:layout_marginTop="@dimen/_10sdp"
     app:cardBackgroundColor="@color/card_background"
-    app:cardCornerRadius="20dp"
+    app:cardCornerRadius="@dimen/_20sdp"
     app:cardElevation="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="@dimen/_16sdp">
 
         <TextView
             android:id="@+id/expressionText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/display_text"
-            android:textSize="18sp"
+            android:textSize="@dimen/_18ssp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/resultText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="@dimen/_6sdp"
             android:textColor="@color/operator_button_background"
-            android:textSize="22sp"
+            android:textSize="@dimen/_22ssp"
             android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/_12sdp"
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCopy"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="@dimen/_40sdp"
                 android:layout_weight="1"
                 android:text="Copy"
                 android:textColor="@color/display_text"
                 android:textAllCaps="false"
                 app:backgroundTint="@color/screen_background"
-                app:cornerRadius="20dp"
+                app:cornerRadius="@dimen/_20sdp"
                 app:strokeWidth="0dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnShare"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
+                android:layout_height="@dimen/_40sdp"
+                android:layout_marginStart="@dimen/_8sdp"
                 android:layout_weight="1"
                 android:text="Share"
                 android:textAllCaps="false"
                 android:textColor="@color/display_text"
                 app:backgroundTint="@color/screen_background"
-                app:cornerRadius="20dp"
+                app:cornerRadius="@dimen/_20sdp"
                 app:strokeWidth="0dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDelete"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
+                android:layout_height="@dimen/_40sdp"
+                android:layout_marginStart="@dimen/_8sdp"
                 android:layout_weight="1"
                 android:text="Delete"
                 android:textAllCaps="false"
                 app:backgroundTint="@color/screen_background"
-                app:cornerRadius="20dp"
+                app:cornerRadius="@dimen/_20sdp"
                 android:textColor="@color/display_text"
                 app:strokeWidth="0dp" />
         </LinearLayout>

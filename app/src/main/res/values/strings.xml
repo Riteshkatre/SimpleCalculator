@@ -7,8 +7,9 @@
     <string name="hide_scientific_mode">Hide scientific mode</string>
     <string name="open_calculators">Open calculators</string>
     <string name="open_menu">Open menu</string>
+    <string name="navigate_back">Navigate back</string>
     <string name="splash_tagline">Fast, clean, and simple</string>
-    <string name="splash_footer">Made By Ritesh ❤️</string>
+    <string name="splash_footer">Made with ❤️ by Ritesh </string>
     <string name="admob_app_id">ca-app-pub-4971360208661687~1905000802</string>
     <string name="admob_banner_unit_id">ca-app-pub-4971360208661687/1179076649</string>
     <string name="admob_interstitial_unit_id">ca-app-pub-4971360208661687/6061079681</string>

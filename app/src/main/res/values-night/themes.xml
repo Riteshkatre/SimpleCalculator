@@ -3,6 +3,9 @@
         <item name="android:statusBarColor">@color/screen_background</item>
         <item name="android:navigationBarColor">@color/screen_background</item>
         <item name="android:windowBackground">@color/screen_background</item>
+        <item name="android:fontFamily">@font/avenir_next</item>
+        <item name="fontFamily">@font/avenir_next</item>
+        <item name="android:textViewStyle">@style/AppTextStyle</item>
     </style>
 
     <style name="Theme.SimpleCalculator" parent="Base.Theme.SimpleCalculator" />
@@ -11,5 +14,8 @@
         <item name="android:windowBackground">@color/splash_background</item>
         <item name="android:statusBarColor">@color/splash_background</item>
         <item name="android:navigationBarColor">@color/splash_background</item>
+        <item name="android:fontFamily">@font/avenir_next</item>
+        <item name="fontFamily">@font/avenir_next</item>
+        <item name="android:textViewStyle">@style/AppTextStyle</item>
     </style>
 </resources>

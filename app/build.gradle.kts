@@ -74,6 +74,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation("com.intuit.sdp:sdp-android:1.1.1")
+    implementation("com.intuit.ssp:ssp-android:1.1.1")
     implementation("com.google.android.gms:play-services-ads:25.4.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

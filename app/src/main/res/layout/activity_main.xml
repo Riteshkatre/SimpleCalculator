@@ -11,9 +11,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/_20sdp"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="@dimen/_10sdp">
 
         <LinearLayout
             android:id="@+id/layoutMain"
@@ -28,58 +28,28 @@
                 android:layout_weight="1"
                 android:text="@string/calculator_title"
                 android:textColor="@color/secondary_text"
-                android:textSize="14sp"
+                android:textSize="@dimen/_16ssp"
                 android:textStyle="bold" />
 
-            <FrameLayout
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/btnScientificMode"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:background="@drawable/bg_top_bar_icon_button"
-                android:clickable="true"
-                android:focusable="true">
+                style="@style/TopBarIconButtonBg"
+                android:contentDescription="@string/show_scientific_mode"
+                app:srcCompat="@drawable/calculator" />
 
-                <ImageView
-                    android:id="@+id/btnScientificModeIcon"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/calculator" />
-            </FrameLayout>
-            <com.google.android.material.button.MaterialButton
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/btnMoreCalculators"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_marginStart="10dp"
-                android:insetLeft="0dp"
-                android:insetTop="0dp"
-                android:insetRight="0dp"
-                android:insetBottom="0dp"
-                app:backgroundTint="@color/card_background"
-                app:cornerRadius="22dp"
-                app:icon="@drawable/dots"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp"
-                app:iconTint="@null"
-                app:strokeWidth="0dp" />
+                style="@style/TopBarIconButtonBg"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:contentDescription="@string/open_calculators"
+                app:srcCompat="@drawable/dots" />
 
-            <com.google.android.material.button.MaterialButton
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/btnOverflowMenu"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_marginStart="10dp"
-                android:insetLeft="0dp"
-                android:insetTop="0dp"
-                android:padding="0dp"
-                android:insetRight="0dp"
-                android:insetBottom="0dp"
-                app:backgroundTint="@color/card_background"
-                app:cornerRadius="22dp"
-                app:icon="@drawable/menu"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp"
-                app:iconTint="@null"
-                app:strokeWidth="0dp" />
+                style="@style/TopBarIconButtonBg"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:contentDescription="@string/open_menu"
+                app:srcCompat="@drawable/menu" />
 
         </LinearLayout>
 
@@ -88,9 +58,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/layoutMain"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="@dimen/_18sdp"
             app:cardBackgroundColor="@color/card_background"
-            app:cardCornerRadius="28dp"
+            app:cardCornerRadius="@dimen/_28sdp"
             app:cardElevation="0dp"
             app:strokeColor="@color/secondary_text"
             app:strokeWidth="0dp">
@@ -99,7 +69,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="@dimen/_20sdp">
 
                 <TextView
                     android:id="@+id/expressionText"
@@ -108,67 +78,68 @@
                     android:gravity="end"
                     android:includeFontPadding="false"
                     android:text="0"
+                    android:singleLine="true"
                     android:textColor="@color/display_text"
-                    android:textSize="26sp"
+                    android:textSize="@dimen/_22ssp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/previewText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/_10sdp"
                     android:gravity="end"
                     android:includeFontPadding="false"
                     android:textColor="@color/secondary_text"
-                    android:textSize="32sp"
+                    android:textSize="@dimen/_22ssp"
                     android:textStyle="bold" />
 
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="@dimen/_16sdp"
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnCopyResult"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="@dimen/_40sdp"
                         android:layout_weight="1"
                         android:text="Copy"
                         android:textAllCaps="false"
                         android:textColor="@color/display_text"
-                        android:textSize="12sp"
+                        android:textSize="@dimen/_12ssp"
                         app:backgroundTint="@color/screen_background"
-                        app:cornerRadius="20dp"
+                        app:cornerRadius="@dimen/_20sdp"
                         app:strokeWidth="0dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnShareResult"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:layout_marginStart="@dimen/_8sdp"
                         android:layout_weight="1"
                         android:text="Share"
                         android:textAllCaps="false"
                         android:textColor="@color/display_text"
-                        android:textSize="12sp"
+                        android:textSize="@dimen/_12ssp"
                         app:backgroundTint="@color/screen_background"
-                        app:cornerRadius="20dp"
+                        app:cornerRadius="@dimen/_20sdp"
                         app:strokeWidth="0dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnSaveResult"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:layout_marginStart="@dimen/_8sdp"
                         android:layout_weight="1"
                         android:text="Save"
                         android:textAllCaps="false"
                         android:textColor="@color/display_text"
-                        android:textSize="12sp"
+                        android:textSize="@dimen/_12ssp"
                         app:backgroundTint="@color/screen_background"
-                        app:cornerRadius="20dp"
+                        app:cornerRadius="@dimen/_20sdp"
                         app:strokeWidth="0dp" />
                 </LinearLayout>
             </LinearLayout>
@@ -179,7 +150,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/numberCard"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/_16sdp"
             android:orientation="vertical"
             android:visibility="gone">
 
@@ -217,7 +188,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:orientation="horizontal">
 
                 <androidx.appcompat.widget.AppCompatButton
@@ -249,7 +220,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:orientation="horizontal">
 
                 <androidx.appcompat.widget.AppCompatButton
@@ -286,8 +257,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/bannerAdContainer"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="@dimen/_16sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -319,7 +290,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:orientation="horizontal">
 
                 <androidx.appcompat.widget.AppCompatButton
@@ -346,7 +317,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:orientation="horizontal">
 
                 <androidx.appcompat.widget.AppCompatButton
@@ -373,7 +344,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:orientation="horizontal">
 
                 <androidx.appcompat.widget.AppCompatButton
@@ -400,7 +371,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:orientation="horizontal">
 
                 <androidx.appcompat.widget.AppCompatButton

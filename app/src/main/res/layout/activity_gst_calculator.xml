@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="@dimen/_16sdp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -21,36 +21,36 @@
             android:orientation="horizontal">
 
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/btnBack"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:src="@drawable/baseline_keyboard_backspace_24"/>
+                style="@style/TopBarIconButton"
+                android:contentDescription="@string/navigate_back"
+                app:srcCompat="@drawable/baseline_keyboard_backspace_24" />
 
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="@dimen/_12sdp"
                 android:text="GST Calculator"
                 android:textColor="@color/display_text"
-                android:textSize="26sp"
+                android:textSize="@dimen/_20ssp"
                 android:textStyle="bold" />
         </LinearLayout>
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="@dimen/_18sdp"
             app:cardBackgroundColor="@color/card_background"
-            app:cardCornerRadius="24dp"
+            app:cardCornerRadius="@dimen/_24sdp"
             app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="@dimen/_18sdp">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
@@ -67,7 +67,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="@dimen/_12sdp"
                     android:hint="GST %">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -81,66 +81,55 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="@dimen/_14sdp"
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn5"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="@dimen/_40sdp"
                         android:layout_weight="1"
                         android:text="5%"
                         android:textAllCaps="false"
                         app:backgroundTint="@color/screen_background"
-                        app:cornerRadius="20dp"
+                        app:cornerRadius="@dimen/_20sdp"
                         app:strokeWidth="0dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn12"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:layout_marginStart="@dimen/_8sdp"
                         android:layout_weight="1"
                         android:text="12%"
                         android:textAllCaps="false"
                         app:backgroundTint="@color/screen_background"
-                        app:cornerRadius="20dp"
+                        app:cornerRadius="@dimen/_20sdp"
                         app:strokeWidth="0dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn18"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:layout_marginStart="@dimen/_8sdp"
                         android:layout_weight="1"
                         android:text="18%"
                         android:textAllCaps="false"
                         app:backgroundTint="@color/screen_background"
-                        app:cornerRadius="20dp"
+                        app:cornerRadius="@dimen/_20sdp"
                         app:strokeWidth="0dp" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn28"
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
-                        android:text="28%"
-                        android:textAllCaps="false"
-                        app:backgroundTint="@color/screen_background"
-                        app:cornerRadius="20dp"
-                        app:strokeWidth="0dp" />
                 </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCalculate"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_height="@dimen/_48sdp"
+                    android:layout_marginTop="@dimen/_16sdp"
                     android:text="Calculate"
                     android:textAllCaps="false"
                     app:backgroundTint="@color/operator_button_background"
-                    app:cornerRadius="24dp"
+                    app:cornerRadius="@dimen/_24sdp"
                     app:strokeWidth="0dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -149,30 +138,30 @@
             android:id="@+id/resultCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/_16sdp"
             android:visibility="gone"
             app:cardBackgroundColor="@color/card_background"
-            app:cardCornerRadius="24dp"
+            app:cardCornerRadius="@dimen/_24sdp"
             app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="@dimen/_18sdp">
 
                 <TextView
                     android:id="@+id/resultSummary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/display_text"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/_18ssp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="@dimen/_16sdp"
                     android:text="GST Amount"
                     android:textColor="@color/secondary_text" />
 
@@ -181,13 +170,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/display_text"
-                    android:textSize="28sp"
+                    android:textSize="@dimen/_28ssp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/_10sdp"
                     android:text="Total"
                     android:textColor="@color/secondary_text" />
 
@@ -196,48 +185,48 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/operator_button_background"
-                    android:textSize="30sp"
+                    android:textSize="@dimen/_30ssp"
                     android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="@dimen/_16sdp"
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnCopy"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="@dimen/_40sdp"
                         android:layout_weight="1"
                         android:text="Copy"
                         android:textAllCaps="false"
                         app:backgroundTint="@color/screen_background"
-                        app:cornerRadius="20dp"
+                        app:cornerRadius="@dimen/_20sdp"
                         app:strokeWidth="0dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnShare"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:layout_marginStart="@dimen/_8sdp"
                         android:layout_weight="1"
                         android:text="Share"
                         android:textAllCaps="false"
                         app:backgroundTint="@color/screen_background"
-                        app:cornerRadius="20dp"
+                        app:cornerRadius="@dimen/_20sdp"
                         app:strokeWidth="0dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnSave"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:layout_marginStart="@dimen/_8sdp"
                         android:layout_weight="1"
                         android:text="Save"
                         android:textAllCaps="false"
                         app:backgroundTint="@color/screen_background"
-                        app:cornerRadius="20dp"
+                        app:cornerRadius="@dimen/_20sdp"
                         app:strokeWidth="0dp" />
                 </LinearLayout>
             </LinearLayout>
